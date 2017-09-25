@@ -7,6 +7,10 @@ import { TweetsListComponent } from './tweets-list/tweets-list.component';
 import { FilterButtonsComponent } from './filter-buttons/filter-buttons.component';
 import { TweetsValuesCounterComponent } from './tweets-values-counter/tweets-values-counter.component';
 
+// Imports for loading & configuring the in-memory web api
+import { InMemoryWebApiModule } from 'angular-in-memory-web-api';
+import { InMemoryDataService }  from './in-memory-data.service';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -17,7 +21,8 @@ import { TweetsValuesCounterComponent } from './tweets-values-counter/tweets-val
   imports: [
     BrowserModule,
     NgbModule.forRoot(),
-    FlexLayoutModule
+    FlexLayoutModule,
+    InMemoryWebApiModule.forRoot(InMemoryDataService),
   ],
   providers: [],
   bootstrap: [AppComponent]
