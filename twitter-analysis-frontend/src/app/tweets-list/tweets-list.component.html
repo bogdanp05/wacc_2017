@@ -6,7 +6,7 @@
    class="btn btn-info btn-cons">Neutral</button>
   <button type="button" (click)="filterBad()"
     class="btn btn-danger btn-cons">Bad</button>
-  <button type="button" (click)="getTweets()" 
+  <button type="button" (click)="getTweets()"
     class="btn btn-primary btn-cons">All</button>
 </div>
 <div class="container" id="table-container">
@@ -24,6 +24,7 @@
     </tr>
     </thead>
     <tbody>
+      <!--{{searchText}}-->
       <tr *ngFor="let tweet of tweets; let i = index;">
           <th scope="row">{{i +1}}</th>
           <td>{{tweet.date}}</td>

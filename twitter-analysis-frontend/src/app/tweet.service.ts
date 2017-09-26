@@ -2,13 +2,22 @@ import { Tweet } from './tweet';
 // import { TWEETS } from './mock-tweets';
 import { Injectable } from '@angular/core';
 import { Headers, Http } from '@angular/http';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class TweetService {
   private tweetsUrl = 'api/tweets';
+  private messageSource = new BehaviorSubject<any>('default sage');
+  getMessageSource() {
+    return this.messageSource.asObservable();
+  }
   constructor(private http: Http) { }
+  changeMessage(message: string) {
+    console.log(message);
+    this.messageSource.next(message);
+  }
 
   getTweets(): Promise<Tweet[]> {
     // return Promise.resolve(TWEETS);
@@ -38,6 +47,16 @@ export class TweetService {
           .then(response => response.json().data as Tweet[])
           .then(tweets => tweets.filter(tweet => tweet.analysis=== quality))
           .catch(this.handleError);
+  }
+
+  searchTweets(searchText: string): Promise<Tweet[]> {
+    // return this.getTweets()
+    //            .then(tweets => tweets.filter(tweet => tweet.analysis=== quality));
+    return this.http.get(this.tweetsUrl)
+      .toPromise()
+      .then(response => response.json().data as Tweet[])
+      .then(tweets => tweets.filter(tweet => tweet.text.indexOf(searchText) > -1))
+      .catch(this.handleError);
   }
 
   private handleError(error: any): Promise<any> {
