@@ -1,0 +1,25 @@
+
+<div class="container" id="table-container">
+  <table class="table">
+    <tbody>
+
+
+    </tbody>
+    <thead class="thead-inverse" id="tablehead">
+    <tr>
+      <th>#</th>
+      <th>Date</th>
+      <th>Tweet</th>
+      <th>Sentimental Analysis</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let tweet of tweets; let i = index;">
+      <th scope="row">{{i +1}}</th>
+      <td>{{tweet.date}}</td>
+      <td>{{tweet.text}}</td>
+      <td ng-class="analysisClass(tweet)">{{tweet.analysis}}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>

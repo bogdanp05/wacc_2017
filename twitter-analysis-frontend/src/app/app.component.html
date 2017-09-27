@@ -1,18 +1,11 @@
 <div class= "container">
   <div class ="jumbotron">
     <h1>Twitter Sentiment Analysis</h1>
-    <!-- <h2> Start find words </h2> -->
-  </div>
-
-  <div class="search-bar-container">
-      <div class="search-bar" id="search-bar">
-        <input type="text" class="form-control input-sm" maxlength="200" placeholder="Search" />
-      </div>
-
-      <button id= "search-bar-button" type="submit" class="btn btn-primary btn-sm">Search </button>
   </div>
 </div>
 
+<app-search-bar></app-search-bar>
 <app-tweets-values-counter></app-tweets-values-counter>
+<app-filter-buttons></app-filter-buttons>
+<app-tweets-table></app-tweets-table>
 
-<tweets-list></tweets-list>

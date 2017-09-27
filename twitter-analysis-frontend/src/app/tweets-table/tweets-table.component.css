@@ -1,0 +1,36 @@
+
+/*	--------------------------------------------------
+	:: Table
+	-------------------------------------------------- */
+
+#tablehead{
+  background-color: black;
+  color: azure;
+}
+
+#table-container{
+  margin-top: 10px;
+  display: flex;
+}
+
+.greenBg {
+  background: green;
+}
+
+.good {
+  color: #5cb85c;
+}
+
+.neutral {
+
+}
+
+.bad {
+  color: crimson;
+}
+
+
+
+#filter-buttons-container {
+  display: flex;
+}
