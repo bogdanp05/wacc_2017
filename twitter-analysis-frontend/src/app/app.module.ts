@@ -24,7 +24,7 @@ import { InMemoryDataService }  from './in-memory-data.service';
     NgbModule.forRoot(),
     FlexLayoutModule,
     HttpModule,
-    InMemoryWebApiModule.forRoot(InMemoryDataService),
+    InMemoryWebApiModule.forRoot(InMemoryDataService, {passThruUnknownUrl: true}),
   ],
   providers: [TweetService],
   bootstrap: [AppComponent]

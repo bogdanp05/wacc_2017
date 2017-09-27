@@ -8,6 +8,7 @@ import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class TweetService {
+  private backendUrl = 'http://localhost:9000/bogdan';
   private tweetsUrl = 'api/tweets';
   private messageSource = new BehaviorSubject<any>('default sage');
   getMessageSource() {
@@ -20,7 +21,13 @@ export class TweetService {
   }
 
   getTweets(): Promise<Tweet[]> {
-    // return Promise.resolve(TWEETS);
+    this.http.get(this.backendUrl)
+          .toPromise()
+          .then (function(response){
+            console.log(response);
+          });
+
+
     return this.http.get(this.tweetsUrl)
           .toPromise()
           .then(response => response.json().data as Tweet[])
