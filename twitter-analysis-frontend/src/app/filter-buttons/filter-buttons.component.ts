@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {TweetService} from '../tweet.service';
 
 @Component({
   selector: 'app-filter-buttons',
@@ -7,9 +8,24 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FilterButtonsComponent implements OnInit {
 
-  constructor() { }
+  constructor(private tweetService:  TweetService) { }
 
   ngOnInit() {
   }
 
+  filterGood() {
+    this.tweetService.filterTweets(1);
+  }
+
+  filterNeutral() {
+    this.tweetService.filterTweets(0);
+  }
+
+  filterBad() {
+    this.tweetService.filterTweets(-1);
+  }
+
+  getTweets() {
+    this.tweetService.filterAllTweets();
+  }
 }

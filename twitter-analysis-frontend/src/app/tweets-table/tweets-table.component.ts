@@ -20,29 +20,11 @@ export class TweetsTableComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.tweetService.subject.subscribe(
+      goodTweets => this.tweets = goodTweets
+    );
+    console.log(this.tweets)
     this.getTweets();
-  }
-
-  onSelect(tweet: Tweet): void {
-    this.selectedTweet = tweet;
-  }
-
-  filterGood(): void {
-    this.tweetService
-      .filterTweets(1)
-      .then(tweets => this.tweets = tweets);
-  }
-
-  filterNeutral(): void {
-    this.tweetService
-      .filterTweets(0)
-      .then(tweets => this.tweets = tweets);
-  }
-
-  filterBad(): void {
-    this.tweetService
-      .filterTweets(-1)
-      .then(tweets => this.tweets = tweets);
   }
 
   analysisClass(tweet: Tweet): string {
