@@ -28,7 +28,7 @@ import { TweetsTableComponent } from './tweets-table/tweets-table.component';
     NgbModule.forRoot(),
     FlexLayoutModule,
     HttpModule,
-    InMemoryWebApiModule.forRoot(InMemoryDataService),
+    InMemoryWebApiModule.forRoot(InMemoryDataService, {passThruUnknownUrl: true}),
   ],
   providers: [TweetService],
   bootstrap: [AppComponent]

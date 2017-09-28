@@ -1,9 +1,12 @@
 import { Tweet } from './tweet';
 import { Injectable } from '@angular/core';
 import { Headers, Http } from '@angular/http';
+<<<<<<< HEAD
 import { Observable } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
+=======
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+>>>>>>> development
 
 import 'rxjs/add/operator/toPromise';
 
@@ -11,12 +14,15 @@ import 'rxjs/add/operator/toPromise';
 export class TweetService {
   private backendUrl = 'http://localhost:9000/bogdan';
   private tweetsUrl = 'api/tweets';
+<<<<<<< HEAD
   public subject = new Subject<any>();
   private tweetsResult = Array<Tweet>();
+=======
   private messageSource = new BehaviorSubject<any>('default sage');
   getMessageSource() {
     return this.messageSource.asObservable();
   }
+>>>>>>> development
   constructor(private http: Http) { }
   changeMessage(message: string) {
     console.log(message);
@@ -57,6 +63,18 @@ export class TweetService {
           .catch(this.handleError);
   }
 
+<<<<<<< HEAD
+=======
+  searchTweets(searchText: string): Promise<Tweet[]> {
+    // return this.getTweets()
+    //            .then(tweets => tweets.filter(tweet => tweet.analysis=== quality));
+    return this.http.get(this.tweetsUrl)
+      .toPromise()
+      .then(response => response.json().data as Tweet[])
+      .then(tweets => tweets.filter(tweet => tweet.text.indexOf(searchText) > -1))
+      .catch(this.handleError);
+  }
+>>>>>>> development
 
   private handleError(error: any): Promise<any> {
     console.error('An error occurred', error); // for demo purposes only
