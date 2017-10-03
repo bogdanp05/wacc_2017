@@ -57,6 +57,18 @@ export class TweetService {
           .catch(this.handleError);
   }
 
+  filterTweetsWithText(text: string) {
+
+    this.http.get(this.tweetsUrl)
+      .toPromise()
+      .then(response => response.json().data as Tweet[])
+      .then(tweets => {
+        this.tweetsResult = tweets.filter(tweet => tweet.text.includes(text));
+        this.subject.next(this.tweetsResult);
+      })
+      .catch(this.handleError);
+  }
+
 
   private handleError(error: any): Promise<any> {
     console.error('An error occurred', error); // for demo purposes only
