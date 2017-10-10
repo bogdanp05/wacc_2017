@@ -1,0 +1,22 @@
+<div class="container" id="line-chart" margin="auto" >
+
+  <div class="row">
+    <div class="col-md-6" >
+      <div class="container" style="display: block;">
+        <canvas baseChart width="2500" height="500"
+                [datasets]="lineChartData"
+                [labels]="lineChartLabels"
+                [options]="lineChartOptions"
+                [colors]="lineChartColors"
+                [legend]="lineChartLegend"
+                [chartType]="lineChartType"
+                (chartHover)="chartHovered($event)"
+                (chartClick)="chartClicked($event)"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="node_modules/chart.js/src/chart.js"></script>
