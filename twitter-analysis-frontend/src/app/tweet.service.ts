@@ -9,7 +9,8 @@ import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class TweetService {
-  private backendUrl = 'http://localhost:9000/bogdan';
+  //private backendUrl = 'http://localhost:9000/bogdan';
+  private backendUrl = 'http://' + window.location.hostname + ':9000/bogdan';
   private tweetsUrl = 'api/tweets';
   public subject = new Subject<any>();
   private tweetsResult = Array<Tweet>();

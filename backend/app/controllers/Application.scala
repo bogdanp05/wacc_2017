@@ -11,6 +11,7 @@ import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMo
 import reactivemongo.play.json._
 import reactivemongo.play.json.collection._
 import models.Tweet
+import reactivemongo.api.Cursor
 
 /*
  * Example using ReactiveMongo + Play JSON library.
@@ -57,8 +58,9 @@ class Application @Inject()(val reactiveMongoApi: ReactiveMongoApi, cc: Controll
     // the cursor of documents
     //val found = collection.map(_.find(Json.obj()).sort(sort).cursor[Tweet]())
     val found = collection.map(_.find(Json.obj()).cursor[Tweet]())
-
+// cursor.collect[Vector](3, Cursor.FailOnError())
     // build (asynchronously) a list containing all the articles
+    //
     found.flatMap(_.collect[List]()).map { tweets =>
       Ok(Json.toJson(tweets))
     }.recover {
