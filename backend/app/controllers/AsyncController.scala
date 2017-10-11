@@ -9,6 +9,8 @@ import play.api.libs.json.Json
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
+
+import play.modules.reactivemongo._
 /**
  * This controller creates an `Action` that demonstrates how to write
  * simple asynchronous code in a controller. It uses a timer to
@@ -25,7 +27,8 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * a blocking API.
  */
 @Singleton
-class AsyncController @Inject()(cc: ControllerComponents, actorSystem: ActorSystem)(implicit exec: ExecutionContext) extends AbstractController(cc) {
+class AsyncController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: ControllerComponents, actorSystem: ActorSystem)(implicit exec: ExecutionContext)
+  extends AbstractController(cc) with MongoController with ReactiveMongoComponents {
 
   /**
    * Creates an Action that returns a plain text message after a delay
@@ -38,6 +41,9 @@ class AsyncController @Inject()(cc: ControllerComponents, actorSystem: ActorSyst
   def message = Action.async {
     getFutureMessage(1.second).map { msg => Ok(msg) }
   }
+
+  def getTweets(text: String) = TODO
+
 
   private def getFutureMessage(delayTime: FiniteDuration): Future[String] = {
     val promise: Promise[String] = Promise[String]()
