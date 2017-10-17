@@ -1,14 +1,13 @@
 version: '2'
  
 services:
- 
+  # Build the container using the Dockerfile provided by Play Framework
+  backend:
+      build: ./backend/target/docker/stage
+
   # Build the container using the client Dockerfile
   client:
       build: ./twitter-analysis-frontend
-  
-  # Build the container using the backend Dockerfile
-  backend:
-      build: ./backend
  
   # Build the container using the nginx Dockerfile
   nginx:
@@ -19,5 +18,5 @@ services:
       - "9000:9000"
     # Link the client container so that Nginx will have access to it
     links:
-      - client
       - backend
+      - client
