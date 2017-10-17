@@ -51,18 +51,10 @@ class Application @Inject()(val reactiveMongoApi: ReactiveMongoApi, cc: Controll
   } yield fs
 
   //   list all articles and sort them
-  def getTweets: Action[AnyContent] = Action.async { implicit request =>
-    // get a sort document (see getSort method for more information)
-    //val sort: JsObject = getSort(request).getOrElse(Json.obj())
-
-    // the cursor of documents
-    //val found = collection.map(_.find(Json.obj()).sort(sort).cursor[Tweet]())
+  def getTweets(word: String): Action[AnyContent] = Action.async { implicit request =>
     val found = collection.map(_.find(Json.obj()).cursor[Tweet]())
-// cursor.collect[Vector](3, Cursor.FailOnError())
-    // build (asynchronously) a list containing all the articles
-    //
     found.flatMap(_.collect[List]()).map { tweets =>
-      Ok(Json.toJson(tweets))
+      Ok(Json.toJson(tweets)).enableCors
     }.recover {
       case e =>
         e.printStackTrace()
@@ -93,18 +85,13 @@ class Application @Inject()(val reactiveMongoApi: ReactiveMongoApi, cc: Controll
   }
 
 
-//  private def getSort(request: Request[_]): Option[JsObject] =
-//    request.queryString.get("sort").map { fields =>
-//      val sortBy = for {
-//        order <- fields.map { field =>
-//          if (field.startsWith("-"))
-//            field.drop(1) -> -1
-//          else field -> 1
-//        }
-//        if order._1 == "date"
-//      } yield order._1 -> implicitly[Json.JsValueWrapper](Json.toJson(order._2))
-//
-//      Json.obj(sortBy: _*)
-//    }
+  implicit class RichResult (result: Result) {
+    def enableCors =  result.withHeaders(
+      "Access-Control-Allow-Origin" -> "*"
+      , "Access-Control-Allow-Methods" -> "OPTIONS, GET, POST, PUT, DELETE, HEAD"   // OPTIONS for pre-flight
+      , "Access-Control-Allow-Headers" -> "Accept, Content-Type, Origin, X-Json, X-Prototype-Version, X-Requested-With" //, "X-My-NonStd-Option"
+      , "Access-Control-Allow-Credentials" -> "true"
+    )
+  }
 }
 

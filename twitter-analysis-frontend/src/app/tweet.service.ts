@@ -25,14 +25,14 @@ export class TweetService {
   }
 
   getTweets(): Promise<Tweet[]> {
-    this.http.get(this.backendUrl)
+    this.http.get('http://' + window.location.hostname + ':9000/getTweets/' + 'hola')
           .toPromise()
           .then (function(response){
-            console.log(response);
+            console.log(response.json() as Tweet[]);
           });
 
 
-    return this.http.get(this.tweetsUrl)
+    return this.http.get('http://' + window.location.hostname + ':9000/getTweets/' + 'hola')
           .toPromise()
           .then(response => response.json().data as Tweet[])
           .catch(this.handleError);

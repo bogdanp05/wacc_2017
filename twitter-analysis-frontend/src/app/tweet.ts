@@ -1,6 +1,6 @@
 export class Tweet {
   id: number;
   date: string;
-  text: string;
+  content: string;
   analysis: number; //-1, 0, or 1
 }
