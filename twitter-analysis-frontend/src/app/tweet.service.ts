@@ -64,7 +64,7 @@ export class TweetService {
       .toPromise()
       .then(response => response.json().data as Tweet[])
       .then(tweets => {
-        this.tweetsResult = tweets.filter(tweet => tweet.text.includes(text));
+        this.tweetsResult = tweets.filter(tweet => tweet.content.includes(text));
         this.subject.next(this.tweetsResult);
       })
       .catch(this.handleError);

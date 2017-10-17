@@ -20,14 +20,14 @@ services:
       #      - "4200:4200"
       # networks:
       #      - isolation-network
- 
+
   # Build the container using the nginx Dockerfile
   nginx:
     build: ./nginx
     # Map Nginx port 80 to the local machine's port 4200
     ports:
       - "4200:80"
-      # - "9000:9000"
+      # - "9000:9000"  
     # Link the client container so that Nginx will have access to it
     links:
       - backend
