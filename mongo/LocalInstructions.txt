@@ -1,0 +1,35 @@
+Inside terminal:
+Start mongo service:
+>sudo service mongod start
+
+Enter mongo shell:
+>mongo
+
+
+Inside mongo shell:
+Show databases:
+>show dbs
+
+Choose tweetsdb (if it doesn't exist it creates it automatically):
+>use tweetsdb
+
+Show collections (which are basically like tables from SQL):
+>show collections
+
+Create collection if it doesn't exist:
+>db.createCollection("tweets")
+
+Bulk insert some documents (rows):
+>var bulk = db.tweets.initializeUnorderedBulkOp();
+bulk.insert( { timestamp: new Date(), content: "mao test text", nickname: "John Doe", url:"skvhsrbjvs" } );
+bulk.insert( { timestamp: new Date(), content: "mao test text", nickname: "Johnny Doe", url:"skvhsrbjvs" } );
+bulk.insert( { timestamp: new Date(), content: "mao test text", nickname: "Jack Doe", url:"skvhsrbjvs" } );
+bulk.insert( { timestamp: new Date(), content: "mao test text", nickname: "yuki", url:"skvhsrbjvs" } );
+bulk.insert( { timestamp: new Date(), content: "mao test text", nickname: "alex", url:"skvhsrbjvs" } );
+bulk.insert( { timestamp: new Date(), content: "mao test text", nickname: "bogdan", url:"skvhsrbjvs" } );
+bulk.execute()
+
+Show contents of collection:
+db.tweets.find().pretty()
+
+
