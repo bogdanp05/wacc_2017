@@ -21,13 +21,10 @@ Create collection if it doesn't exist:
 
 Bulk insert some documents (rows):
 >var bulk = db.tweets.initializeUnorderedBulkOp();
-bulk.insert( { timestamp: new Date(), content: "mao test text", nickname: "John Doe", url:"skvhsrbjvs" } );
-bulk.insert( { timestamp: new Date(), content: "mao test text", nickname: "Johnny Doe", url:"skvhsrbjvs" } );
-bulk.insert( { timestamp: new Date(), content: "mao test text", nickname: "Jack Doe", url:"skvhsrbjvs" } );
-bulk.insert( { timestamp: new Date(), content: "mao test text", nickname: "yuki", url:"skvhsrbjvs" } );
-bulk.insert( { timestamp: new Date(), content: "mao test text", nickname: "alex", url:"skvhsrbjvs" } );
-bulk.insert( { timestamp: new Date(), content: "mao test text", nickname: "bogdan", url:"skvhsrbjvs" } );
-bulk.execute()
+bulk.insert( { timestamp: 1508356825, nickname: "user1", content: "Hey, good morning", url: "www.google.es", analysis: -1});
+bulk.insert( { timestamp: 1508356825, nickname: "user2", content: "Hey", url: "www.google.es", analysis: 0});
+bulk.insert( { timestamp: 1508356825, nickname: "user3", content: "morning", url: "www.google.es", analysis: 1});
+bulk.execute();
 
 Show contents of collection:
 db.tweets.find().pretty()
