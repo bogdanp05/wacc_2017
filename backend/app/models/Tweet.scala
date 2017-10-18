@@ -6,10 +6,12 @@ import play.api.data.Forms._
 import play.api.data.validation.Constraints.pattern
 
 case class Tweet(
-                  id: Option[String],
+                  id: Option[Long],
+                  timestamp: Option[Long],
+                  nickname: String,
                   content: String,
-                  author: String,
-                  creationDate: Option[DateTime])
+                  url: String,
+                  analysis: Int)
 
 
 // Turn off your mind, relax, and float downstream
@@ -19,21 +21,26 @@ object Tweet {
 
   implicit object ArticleWrites extends OWrites[Tweet] {
     def writes(tweet: Tweet): JsObject = Json.obj(
-      "_id" -> tweet.id,
+      "id" -> tweet.id,
+      "timestamp" -> tweet.timestamp,
+      "nickname" -> tweet.nickname,
       "content" -> tweet.content,
-      "author" -> tweet.author,
-      "creationDate" -> tweet.creationDate.fold(-1L)(_.getMillis))
+      "url" -> tweet.url,
+      "analysis" -> tweet.analysis
+    )
   }
 
   implicit object ArticleReads extends Reads[Tweet] {
     def reads(json: JsValue): JsResult[Tweet] = json match {
       case obj: JsObject => try {
-        val id = (obj \ "_id").asOpt[String]
+        val id = (obj \ "id").asOpt[Long]
+        val timestamp = (obj \ "timestamp").asOpt[Long]
+        val nickname = (obj \ "nickname").as[String]
         val content = (obj \ "content").as[String]
-        val author = (obj \ "author").as[String]
-        val creationDate = (obj \ "creationDate").asOpt[Long]
+        val url = (obj \ "url").as[String]
+        val analysis = (obj \ "analysis").as[Int]
 
-        JsSuccess(Tweet(id, content, author, creationDate.map(new DateTime(_))))
+        JsSuccess(Tweet(id, timestamp, nickname, content, url, analysis))
 
       } catch {
         case cause: Throwable => JsError(cause.getMessage)
@@ -45,23 +52,23 @@ object Tweet {
 
   val form = Form(
     mapping(
-      "id" -> optional(text verifying pattern(
-        """[a-fA-F0-9]{24}""".r, error = "error.objectId")),
+      "id" -> optional(longNumber),
+      "timestamp" -> optional(longNumber),
+      "nickname" -> nonEmptyText,
       "content" -> text,
-      "author" -> nonEmptyText,
-      "creationDate" -> optional(longNumber)) {
-      (id, content, author, creationDate) =>
-        Tweet(
-          id,
-          content,
-          author,
-          creationDate.map(new DateTime(_)))
+      "url" -> nonEmptyText,
+      "analysis" -> number) {
+      (id, timestamp, nickname, content, url, analysis) =>
+        Tweet(id, timestamp,nickname,content, url, analysis)
     } { tweet =>
       Some(
         (tweet.id,
+          tweet.timestamp,
+          tweet.nickname,
           tweet.content,
-          tweet.author,
-          tweet.creationDate.map(_.getMillis)))
+          tweet.url,
+          tweet.analysis
+        ))
     })
 }
 

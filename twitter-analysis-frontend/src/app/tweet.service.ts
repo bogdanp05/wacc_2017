@@ -34,7 +34,7 @@ export class TweetService {
 
     return this.http.get('http://' + window.location.hostname + ':9000/getTweets/' + 'hola')
           .toPromise()
-          .then(response => response.json().data as Tweet[])
+          .then(response => response.json() as Tweet[])
           .catch(this.handleError);
   }
 

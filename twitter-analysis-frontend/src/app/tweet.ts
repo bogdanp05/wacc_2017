@@ -1,6 +1,8 @@
 export class Tweet {
   id: number;
-  date: string;
+  timestamp: number;
+  nickname: string;
   content: string;
-  analysis: number; //-1, 0, or 1
+  url: string;
+  analysis: number;
 }

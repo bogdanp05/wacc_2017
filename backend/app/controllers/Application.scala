@@ -40,7 +40,6 @@ class Application @Inject()(val reactiveMongoApi: ReactiveMongoApi, cc: Controll
   def collection: Future[JSONCollection] = reactiveMongoApi.database.
     map(_.collection[JSONCollection]("tweets"))
 
-
   private val gridFS = for {
     fs <- reactiveMongoApi.database.map(db =>
       GridFS[JSONSerializationPack.type](db))
@@ -49,20 +48,6 @@ class Application @Inject()(val reactiveMongoApi: ReactiveMongoApi, cc: Controll
       Logger.info(s"Checked index, result is $index")
     }
   } yield fs
-
-  //   list all articles and sort them
-  def getTweets(word: String): Action[AnyContent] = Action.async { implicit request =>
-    val found = collection.map(_.find(Json.obj()).cursor[Tweet]())
-    found.flatMap(_.collect[List]()).map { tweets =>
-      Ok(Json.toJson(tweets)).enableCors
-    }.recover {
-      case e =>
-        e.printStackTrace()
-        BadRequest(e.getMessage())
-    }
-  }
-
-
 
   def delete(id: String) = Action.async {
     // let's collect all the attachments matching that match the article to delete
