@@ -13,7 +13,8 @@ export class TweetService {
   private backendUrl = 'http://' + window.location.hostname + ':9000/bogdan';
   private tweetsUrl = 'api/tweets';
   public subject = new Subject<any>();
-  private tweetsResult = Array<Tweet>();
+  private tweets = new Array<Tweet>();
+  private tweetsResult = new Array<Tweet>();
   private messageSource = new BehaviorSubject<any>('default sage');
   getMessageSource() {
     return this.messageSource.asObservable();
@@ -25,51 +26,27 @@ export class TweetService {
   }
 
   getTweets(): Promise<Tweet[]> {
-    this.http.get('http://' + window.location.hostname + ':9000/getTweets/' + 'hola')
-          .toPromise()
-          .then (function(response){
-            console.log(response.json() as Tweet[]);
-          });
-
-
-    return this.http.get('http://' + window.location.hostname + ':9000/getTweets/' + 'hola')
-          .toPromise()
-          .then(response => response.json() as Tweet[])
-          .catch(this.handleError);
+    const tweetsJSON = this.http.get('http://' + window.location.hostname + ':9000/getAllTweets')
+      .toPromise()
+      .then(response => response.json() as Tweet[])
+      .catch(this.handleError);
+    tweetsJSON.then(tweets => this.tweets = tweets);
+    return tweetsJSON;
   }
 
   filterAllTweets() {
-    this.http.get(this.tweetsUrl)
-      .toPromise()
-      .then(response => response.json().data as Tweet[])
-      .then(tweets => this.subject.next(tweets))
-      .catch(this.handleError);
+    this.subject.next(this.tweets);
   }
 
   filterTweets(quality: number) {
-
-    this.http.get(this.tweetsUrl)
-          .toPromise()
-          .then(response => response.json().data as Tweet[])
-          .then(tweets => {
-            this.tweetsResult = tweets.filter(tweet => tweet.analysis === quality);
-            this.subject.next(this.tweetsResult);
-          })
-          .catch(this.handleError);
+    this.tweetsResult = this.tweets.filter(tweet => tweet.analysis === quality);
+    this.subject.next(this.tweetsResult);
   }
 
   filterTweetsWithText(text: string) {
-
-    this.http.get(this.tweetsUrl)
-      .toPromise()
-      .then(response => response.json().data as Tweet[])
-      .then(tweets => {
-        this.tweetsResult = tweets.filter(tweet => tweet.content.includes(text));
-        this.subject.next(this.tweetsResult);
-      })
-      .catch(this.handleError);
+    this.tweetsResult = this.tweets.filter(tweet => tweet.content.includes(text));
+    this.subject.next(this.tweetsResult);
   }
-
 
   private handleError(error: any): Promise<any> {
     console.error('An error occurred', error); // for demo purposes only

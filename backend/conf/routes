@@ -14,6 +14,8 @@ GET     /bogdan                     controllers.TweetController.bogdan
 
 GET     /getTweets/:word            controllers.TweetController.getTweets(word: String)
 
+GET     /getAllTweets               controllers.TweetController.getAllTweets
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 

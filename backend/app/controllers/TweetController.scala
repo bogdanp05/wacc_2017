@@ -61,6 +61,18 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
     }
   }
 
+  def getAllTweets(): Action[AnyContent] = Action.async { implicit request =>
+    val found = collection.map(_.find(Json.obj()).cursor[Tweet]())
+    found.flatMap(_.collect[List]()).map { tweets =>
+      var tweetsJSON = Json.toJson(tweets)
+      Ok(tweetsJSON).enableCors
+    }.recover {
+      case e =>
+        e.printStackTrace()
+        BadRequest(e.getMessage())
+    }
+  }
+
 
   private def getFutureBogdan(delayTime: FiniteDuration): Future[String] = {
     val promise: Promise[String] = Promise[String]()
