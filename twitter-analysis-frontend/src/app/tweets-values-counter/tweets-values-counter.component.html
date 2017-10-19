@@ -13,28 +13,28 @@
             <div class="col-md-3">
               <div class="single_counter p-y-2 m-t-1">
                 <i class="fa fa-smile-o m-b-1"></i>
-                <h2 class="statistic-counter">100</h2>
+                <h2 class="statistic-counter">{{ getNumberOfTweets(1) }}</h2>
                 <p>Positive tweets</p>
               </div>
             </div>
             <div class="col-md-3">
               <div class="single_counter p-y-2 m-t-1">
                 <i class="fa fa-meh-o m-b-1"></i>
-                <h2 class="statistic-counter">400</h2>
-                <p>Neutraltweets</p>
+                <h2 class="statistic-counter">{{ getNumberOfTweets(0) }}</h2>
+                <p>Neutral tweets</p>
               </div>
             </div>
             <div class="col-md-3">
               <div class="single_counter p-y-2 m-t-1">
                 <i class="fa fa-frown-o m-b-1"></i>
-                <h2 class="statistic-counter">312</h2>
+                <h2 class="statistic-counter">{{ getNumberOfTweets(-1) }}</h2>
                 <p>Negative  tweets</p>
               </div>
             </div>
             <div class="col-md-3">
               <div class="single_counter p-y-2 m-t-1">
                 <i class="fa fa-comment-o m-b-1"></i>
-                <h2 class="statistic-counter">480</h2>
+                <h2 class="statistic-counter">{{ getNumberOfAllTweets() }}</h2>
                 <p>All</p>
               </div>
             </div>

@@ -8,7 +8,6 @@ import {TweetService} from '../tweet.service';
 })
 export class SearchBarComponent implements OnInit {
 
-  searchValue = '';
   constructor(private tweetService:  TweetService) { }
 
   ngOnInit() {
