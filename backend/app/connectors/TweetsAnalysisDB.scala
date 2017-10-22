@@ -4,7 +4,10 @@ import Connector.connector
 import models._
 import com.outworkers.phantom.connectors.CassandraConnection
 import com.outworkers.phantom.dsl._
-import scala.concurrent.Future
+import play.api.Logger
+
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration.Duration
 
 /**
   * Database object that wraps the existing table
@@ -38,6 +41,18 @@ class TweetsAnalysisDB (override val connector: CassandraConnection) extends Dat
       byAnalysis <- AnalysisResultsModel.store(result).future
     } yield byAnalysis
   }
+
+  /**
+    * Create table if not exist
+    *
+    */
+
+  def start()={
+    Logger.debug("Create table if not exist")
+    Await.ready(AnalysisResultsModel.create.ifNotExists().future(), Duration.Inf)
+  }
+
+
 }
 
 /**

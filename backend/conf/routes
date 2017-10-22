@@ -19,4 +19,5 @@ GET     /getAllTweets               controllers.TweetController.getAllTweets
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
-      
+GET      /db/:id                    controllers.CassandraController.list(id: String)
+GET      /test/:id                    controllers.CassandraController.write(id: String)
