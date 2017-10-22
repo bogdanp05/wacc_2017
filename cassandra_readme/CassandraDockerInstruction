@@ -1,0 +1,29 @@
+Inside terminal
+make sure you are in the same path of the Makefile
+>cd 2017_group_16_s3480941_s3540197_s3346935
+
+make sure you have stopped the cassandra container in case you run before
+>make stop
+
+run cassandraDB with docker
+>make cassandra
+
+
+# for test the connect and functions of cassandraDB
+Open another teminal
+make sure you are in the path of the backend 
+>cd 2017_group_16_s3480941_s3540197_s3346935/backend
+
+>sbt compile
+>sbt run
+
+once it successes without any error
+enter < localhost:9000/db/1 > in browser
+you will see [{"id":"1","keyword":"123","tweet":"aaa","value":"1"}]
+
+enter < localhost:9000/test/1 > in browser
+you will see ResultSet(ResultSet[ exhausted: true, Columns[]],V4)
+
+
+remember to stop the cassandra container
+>make stop
