@@ -9,6 +9,7 @@
     <tr>
       <th>#</th>
       <th>Date</th>
+      <th>Username</th>
       <th>Tweet</th>
       <th>Sentimental Analysis</th>
     </tr>
@@ -16,9 +17,11 @@
     <tbody>
     <tr *ngFor="let tweet of tweets; let i = index;">
       <th scope="row">{{i +1}}</th>
-      <td>{{tweet.date}}</td>
-      <td>{{tweet.text}}</td>
-      <td ng-class="analysisClass(tweet)">{{tweet.analysis}}</td>
+      <td>{{tweet.timestamp}}</td>
+      <td>{{tweet.nickname}}</td>
+      <td>{{tweet.content}}</td>
+      <td>{{tweet.analysis}}</td>
+      <!--<td ng-class="analysisClass(tweet)">{{tweet.analysis}}</td>-->
     </tr>
     </tbody>
   </table>
