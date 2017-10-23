@@ -1,0 +1,6 @@
+1. When everything in containers connect to mongo
+2. When everything in containers connect to casssandra
+3. All should work in containers
+4. Deployment on Google Cloud with Kubernetes
+5. Replication.
+6. Get data from csv and put in mongo and cass(analysis).
