@@ -6,5 +6,10 @@ cassandra:
 #type "make stop" in terminal to stop the container
 stop:
 	@docker stop cassandra
+
+start:
+	@docker start cassandra
+
+remove:
 	@docker rm cassandra
 	@docker rm cassandra-vol
