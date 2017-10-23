@@ -3,16 +3,12 @@ package controllers
 import javax.inject._
 
 import akka.actor.ActorSystem
-import play.api.mvc._
-import play.api.libs.json.Json
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future, Promise}
 
 import javax.inject.Inject
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
-import play.api.Logger
 import play.api.mvc._
 import play.api.libs.json.{JsObject, JsString, Json}
 import reactivemongo.api.gridfs.{GridFS, ReadFile}
@@ -20,14 +16,40 @@ import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMo
 import reactivemongo.play.json._
 import reactivemongo.play.json.collection._
 import models.Tweet
-import play.modules.reactivemongo._
-import MongoController.readFileReads
 
 @Singleton
 class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: ControllerComponents, actorSystem: ActorSystem)(implicit exec: ExecutionContext)
   extends AbstractController(cc) with MongoController with ReactiveMongoComponents {
 
   type JSONReadFile = ReadFile[JSONSerializationPack.type, JsString]
+
+  val positiveArrayAdjectives = Array("adaptable", "adventurous", "affable", "affectionate", "agreeable", "ambitious",
+    "amiable", "amicable", "amusing", "brave", "bright", "broad-minded", "calm", "careful", "charming",
+    "communicative", "compassionate ", "conscientious", "considerate", "convivial", "courageous", "courteous",
+    "creative", "decisive", "determined", "diligent", "diplomatic", "discreet", "dynamic", "easygoing",
+    "emotional", "energetic", "enthusiastic", "exuberant", "fair-minded", "faithful", "fearless", "forceful",
+    "frank", "friendly", "funny", "generous", "gentle", "good", "gregarious", "hard-working", "helpful",
+    "honest", "humorous", "imaginative", "impartial", "independent", "intellectual", "intelligent", "intuitive",
+    "inventive", "kind", "loving", "loyal", "modest", "neat", "nice", "optimistic", "passionate",
+    "patient", "persistent ", "pioneering", "philosophical", "placid", "plucky", "polite", "powerful", "practical",
+    "pro-active", "quick-witted", "quiet", "rational", "reliable", "reserved", "resourceful", "romantic", "",
+    "self-confident", "self-disciplined", "sensible", "sensitive", "shy", "sincere", "sociable", "straightforward",
+    "sympathetic", "thoughtful", "tidy", "tough", "unassuming", "understanding", "versatile", "",
+    "warmhearted", "willing", "witty")
+
+  val negativeArrayAdjectives = Array("aggressive", "aloof", "arrogant", "belligerent", "big-headed", "bitchy",
+    "boastful", "bone-idle", "boring", "bossy", "callous", "cantankerous", "careless", "changeable", "clinging",
+    "compulsive", "conservative", "cowardly", "cruel", "cunning", "cynical", "deceitful", "detached", "dishonest",
+    "dogmatic", "domineering", "finicky", "flirtatious", "foolish", "foolhardy", "fussy", "greedy", "grumpy", "gullible",
+    "harsh", "impatient", "impolite", "impulsive", "inconsiderate", "inconsistent", "indecisive", "indiscreet",
+    "inflexible", "interfering", "intolerant", "irresponsible", "jealous", "lazy", "Machiavellian", "materialistic",
+    "mean", "miserly", "moody", "narrow-minded", "nasty", "naughty", "nervous", "obsessive", "obstinate", "overcritical",
+    "overemotional", "parsimonious", "patronizing", "perverse", "pessimistic", "pompous", "possessive", "pusillanimous",
+    "quarrelsome", "quick-tempered", "resentful", "rude", "ruthless", "sarcastic", "secretive", "selfish", "self-centred",
+    "self-indulgent", "silly", "sneaky", "stingy", "stubborn", "stupid", "superficial", "tactless", "timid", "touchy",
+    "thoughtless", "truculent", "unkind", "unpredictable", "unreliable", "untidy", "untrustworthy", "vague", "vain",
+    "vengeful", "vulgar", "weak-willed", "shit", "fuck", "asshole", "motherfucker", "fuck")
+
 
   // get the collection 'tweets'
   def collection: Future[JSONCollection] = reactiveMongoApi.database.
@@ -46,7 +68,34 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
   }
 
   def bogdan = Action.async {
-    getFutureBogdan(2.second).map { msg => Ok(Json.obj("ok"->msg)).enableCors }
+
+
+    getFutureBogdan(2.second).map { msg => Ok(Json.obj("hey/"+getSentimentAnalysis("shit witty")->msg)).enableCors }
+  }
+
+  private def getSentimentAnalysis(tweet: String): Double = {
+    val words = tweet.split("\\s+")
+    var sentimentAnalysisResult:Double = 0
+    for(word <- words){
+      if (this.positiveArrayAdjectives.contains(word)) {
+        sentimentAnalysisResult += 1
+      }
+      if (this.negativeArrayAdjectives.contains(word)) {
+        sentimentAnalysisResult -= 1
+      }
+    }
+
+    if (sentimentAnalysisResult == 0) {
+      return 0
+    }
+    else if (sentimentAnalysisResult < 0) {
+      return -1
+    }
+    else if (sentimentAnalysisResult > 0) {
+      return 1
+    }
+
+    return 0
   }
 
   def getTweets(word: String): Action[AnyContent] = Action.async { implicit request =>
@@ -72,7 +121,6 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
         BadRequest(e.getMessage())
     }
   }
-
 
   private def getFutureBogdan(delayTime: FiniteDuration): Future[String] = {
     val promise: Promise[String] = Promise[String]()
