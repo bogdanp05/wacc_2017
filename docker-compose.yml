@@ -1,28 +1,31 @@
 version: '2'
 
 networks:
-  isolation-network:
+  internal-net:
     driver: bridge
 
 volumes:
-  mongo_data: {}
-  cassandra_data: {}  
+  mongo-vol: {}
+  cassandra-vol: {}  
  
 services:
 
   mongo:
     image: mongo:3.4
     networks:
-      - isolation-network
+      - internal-net
     volumes:
-      - mongo_data:/data/db
+      - mongo-vol:/data/db
 
   cassandra:
     image: cassandra:3.0
     networks:
-      - isolation-network
+      - internal-net
+    ports:
+      - "7000:7000"
+      - "9042:9042"
     volumes:
-      - cassandra_data:/cassandra/data/db
+      - cassandra-vol:/cassandraDB
 
   # Build the container using the Dockerfile provided by Play Framework
   backend:
@@ -30,7 +33,10 @@ services:
       ports:
             - "9000:9000"
       networks:
-            - isolation-network
+            - internal-net
+      environment:
+            - MONGO_ENV= "mongodb://mongo:27017/tweetsdb"
+            - CASSANDRA_ENV= "cassandradb://cassandra:9042"
 
   # Build the container using the client Dockerfile
   client:
