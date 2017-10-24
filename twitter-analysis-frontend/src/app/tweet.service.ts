@@ -26,6 +26,11 @@ export class TweetService {
   }
 
   getTweets(): Promise<Tweet[]> {
+    this.http.get(this.backendUrl) // I'm adding this to test the connecttion to the backend without db
+      .toPromise()
+      .then (function(response){
+        console.log(response);
+      });
     const tweetsJSON = this.http.get('http://' + window.location.hostname + ':9000/getAllTweets')
       .toPromise()
       .then(response => response.json() as Tweet[])

@@ -13,3 +13,14 @@ start:
 remove:
 	@docker rm cassandra
 	@docker rm cassandra-vol
+
+
+# Stop and remove all the containers
+clear:
+	@docker stop $(shell docker ps -aq)
+	@docker rm $(shell docker ps -aq)
+
+# Build all the containers
+compose:
+	@(cd ./backend && sbt docker:publishLocal)
+	@docker-compose up -d --build --remove-orphans

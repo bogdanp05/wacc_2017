@@ -3,8 +3,27 @@ version: '2'
 networks:
   isolation-network:
     driver: bridge
+
+volumes:
+  mongo_data: {}
+  cassandra_data: {}  
  
 services:
+
+  mongo:
+    image: mongo:3.4
+    networks:
+      - isolation-network
+    volumes:
+      - mongo_data:/data/db
+
+  cassandra:
+    image: cassandra:3.0
+    networks:
+      - isolation-network
+    volumes:
+      - cassandra_data:/cassandra/data/db
+
   # Build the container using the Dockerfile provided by Play Framework
   backend:
       build: ./backend/target/docker/stage
@@ -15,11 +34,11 @@ services:
 
   # Build the container using the client Dockerfile
   client:
-      build: ./twitter-analysis-frontend
-      # ports:
-      #      - "4200:4200"
-      # networks:
-      #      - isolation-network
+       build: ./twitter-analysis-frontend
+       # ports:
+       #    - "4200:4200"
+       # networks:
+       #    - isolation-network
 
   # Build the container using the nginx Dockerfile
   nginx:

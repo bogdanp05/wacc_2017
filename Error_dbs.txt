@@ -1,0 +1,36 @@
+[info] application - ApplicationTimer demo: Starting application at 2017-10-24T00:15:47.072Z.
+[info] play.api.Play - Application started (Prod)
+[info] p.c.s.AkkaHttpServer - Listening for HTTP on /0.0.0.0:9000
+reactivemongo.core.actors.Exceptions$PrimaryUnavailableException: MongoError['No primary node is available! (Supervisor-1/Connection-2)']
+	at reactivemongo.api.MongoConnection.database(api.scala)
+Caused by: reactivemongo.core.actors.Exceptions$InternalState
+	at reactivemongo.ChannelClosed(-1959369871, {{NodeSet None Node[localhost:27017: Unknown (0/1 available connections), latency=9223372036854775807], auth=Set() }})(<time:1508804298329>)
+	at reactivemongo.Init({{NodeSet None Node[localhost:27017: Unknown (0/1 available connections), latency=9223372036854775807], auth=Set() }})(<time:1508804298258>)
+[debug] application - Called reading: 1
+[debug] application - Create table if not exist
+[error] application - 
+
+! @75m50jl2i - Internal server error, for (GET) [/db/1] ->
+ 
+play.api.UnexpectedException: Unexpected exception[NoHostAvailableException: All host(s) tried for query failed (tried: /127.0.0.1:9042 (com.datastax.driver.core.exceptions.TransportException: [/127.0.0.1:9042] Cannot connect))]
+	at play.api.http.HttpErrorHandlerExceptions$.throwableToUsefulException(HttpErrorHandler.scala:251)
+	at play.api.http.DefaultHttpErrorHandler.onServerError(HttpErrorHandler.scala:182)
+	at play.core.server.AkkaHttpServer$$anonfun$$nestedInanonfun$executeHandler$1$1.applyOrElse(AkkaHttpServer.scala:251)
+	at play.core.server.AkkaHttpServer$$anonfun$$nestedInanonfun$executeHandler$1$1.applyOrElse(AkkaHttpServer.scala:250)
+	at scala.concurrent.Future.$anonfun$recoverWith$1(Future.scala:412)
+	at scala.concurrent.impl.Promise.$anonfun$transformWith$1(Promise.scala:37)
+	at scala.concurrent.impl.CallbackRunnable.run(Promise.scala:60)
+	at play.api.libs.streams.Execution$trampoline$.executeScheduled(Execution.scala:109)
+	at play.api.libs.streams.Execution$trampoline$.execute(Execution.scala:71)
+	at scala.concurrent.impl.CallbackRunnable.executeWithValue(Promise.scala:68)
+Caused by: com.datastax.driver.core.exceptions.NoHostAvailableException: All host(s) tried for query failed (tried: /127.0.0.1:9042 (com.datastax.driver.core.exceptions.TransportException: [/127.0.0.1:9042] Cannot connect))
+	at com.datastax.driver.core.ControlConnection.reconnectInternal(ControlConnection.java:232)
+	at com.datastax.driver.core.ControlConnection.connect(ControlConnection.java:79)
+	at com.datastax.driver.core.Cluster$Manager.negotiateProtocolVersionAndConnect(Cluster.java:1600)
+	at com.datastax.driver.core.Cluster$Manager.init(Cluster.java:1518)
+	at com.datastax.driver.core.Cluster.init(Cluster.java:159)
+	at com.datastax.driver.core.Cluster.connectAsync(Cluster.java:330)
+	at com.datastax.driver.core.Cluster.connectAsync(Cluster.java:305)
+	at com.datastax.driver.core.Cluster.connect(Cluster.java:247)
+	at com.outworkers.phantom.connectors.DefaultSessionProvider.$anonfun$createSession$2(DefaultSessionProvider.scala:66)
+	at akka.dispatch.MonitorableThreadFactory$AkkaForkJoinWorkerThread$$anon$3.block(ThreadPoolBuilder.scala:167)
