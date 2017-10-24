@@ -1,17 +1,21 @@
 ///<reference path="../../../node_modules/@angular/core/src/metadata/directives.d.ts"/>
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {TweetService} from "../tweet.service";
 
 @Component({
   selector: 'app-line-chart',
   templateUrl: './line-chart.component.html',
   styleUrls: ['./line-chart.component.css']
 })
-export class LineChartComponent {
+export class LineChartComponent implements OnInit  {
+
+  constructor(private tweetService:  TweetService) { }
 
   public lineChartData: Array <any> = [
-    {data: [18, 48, -77, 9, 100, 27, -40], label: 'Series'}
+    {data: [18, -1, 48, -77, 9, 100, 27, -40, 0, 0, 0, 1], label: 'Tweets'}
   ];
-  public lineChartLabels: Array <any> = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+  public lineChartLabels: Array <any> = ['Day1', '6am', '12pm', '6pm', 'Day2', '6am', '12pm', '6pm',
+    'Day3', '6am', '12pm', '6pm'];
   public lineChartOptions: any = {
     responsive: true
   };
@@ -27,6 +31,19 @@ export class LineChartComponent {
   ];
   public lineChartLegend = true;
   public lineChartType = 'line';
+
+  ngOnInit() {
+    const amountOfTweetsByMonth = this.getAmountOfTweetsByMonth();
+    this.lineChartData = [
+      {data:  amountOfTweetsByMonth, label: 'Tweets'}
+    ];
+  }
+
+
+
+  getAmountOfTweetsByMonth(): Array<number> {
+    return this.tweetService.getAmountOfTweetsByMonth();
+  }
 
   // events
   public chartClicked(e: any): void {

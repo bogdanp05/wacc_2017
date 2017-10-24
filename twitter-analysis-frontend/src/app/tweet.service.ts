@@ -58,7 +58,11 @@ export class TweetService {
   }
 
   getNumberOfAllTweets() {
-      return this.tweets.length
+      return this.tweets.length;
+  }
+
+  getAmountOfTweetsByMonth(): Array<number> {
+    return [10, 5, 0, -10, 5, -5, 10, 12, -20, 40, 35, 0, 30];
   }
 
   private handleError(error: any): Promise<any> {
