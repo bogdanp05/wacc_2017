@@ -15,7 +15,7 @@ export class SearchBarComponent implements OnInit {
 
 
   search(searchBox): void {
-    this.tweetService.filterTweetsWithText(searchBox);
+    this.tweetService.getTweetsWithWord(searchBox);
   }
 
 }

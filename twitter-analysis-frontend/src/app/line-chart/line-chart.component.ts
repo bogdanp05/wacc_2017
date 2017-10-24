@@ -14,8 +14,8 @@ export class LineChartComponent implements OnInit  {
   public lineChartData: Array <any> = [
     {data: [18, -1, 48, -77, 9, 100, 27, -40, 0, 0, 0, 1], label: 'Tweets'}
   ];
-  public lineChartLabels: Array <any> = ['Day1', '6am', '12pm', '6pm', 'Day2', '6am', '12pm', '6pm',
-    'Day3', '6am', '12pm', '6pm'];
+  public lineChartLabels: Array <any> = ['04/03/2016', '6h', '12h', '18h', '05/03/2016', '6h', '12h', '18h',
+    '06/03/2016', '6h', '12h', '18h'];
   public lineChartOptions: any = {
     responsive: true
   };

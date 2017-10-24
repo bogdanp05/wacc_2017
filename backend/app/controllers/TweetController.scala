@@ -9,12 +9,15 @@ import javax.inject.Inject
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import play.api.mvc._
-import play.api.libs.json.{JsObject, JsString, Json}
+import play.api.libs.json.{JsObject, JsString, JsValue, Json}
 import reactivemongo.api.gridfs.{GridFS, ReadFile}
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
 import reactivemongo.play.json._
 import reactivemongo.play.json.collection._
 import models.{SentimentAnalysis, Tweet}
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import scala.collection.mutable.ListBuffer
 
 import scala.io.Source
 
@@ -45,6 +48,12 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
 
   def bogdan = Action.async {
 
+    val result = collection.map(_.find(Json.obj("id"->2))).onComplete(
+      results => println("result  "+ results)
+    )
+
+
+    //collection.map(_.insert(Tweet(Some(1.toLong),Some(2.toLong),"a","b","c",0)))
 
     val filename = "../tweetsdb.csv"
     var index = 0
@@ -57,7 +66,7 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
       * */
       if (cols.length.equals(6)) {
         if (cols(4).toLowerCase.contains("gop")) {
-          println(getSentimentAnalysis(cols(4).toLowerCase))
+          //println(getSentimentAnalysis(cols(4).toLowerCase))
         }
       }
 
@@ -90,7 +99,37 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
     return 0
   }
 
-  def getTweets(word: String): Action[AnyContent] = Action.async { implicit request =>
+
+  def getTweets(word: String) = Action {
+    val filename = "../tweetsdb.csv"
+    val tweets = ListBuffer[Tweet]()
+    for (line <- Source.fromFile(filename, "ISO-8859-1").getLines) {
+      val cols = line.split(";").map(_.trim)
+      /*
+      * Tweet Id;Date;Hour;Nickname;Tweet content;Tweet Url
+      * 0:ID    1:DATE     2:HOUR     3:NICKNAME     4:CONTENT    5:URL
+      * */
+      if (cols.length.equals(6)) {
+        if (cols(4).toLowerCase.contains(word.toLowerCase)) {
+          var dt = DateTime.parse(cols(1)+" "+cols(2), DateTimeFormat.forPattern("yyyy-MM-dd HH:mm"))
+          var analysis = this.getSentimentAnalysis(cols(4))
+          var tweet = Tweet(cols(0).toLong, dt.getMillis(),cols(3),cols(4),cols(5),analysis)
+          var tweetJSON = Json.toJson(tweet)
+          tweets += tweet
+          println(tweet)
+          println(tweets.toArray.length)
+        }
+
+      }
+    }
+    println(tweets.toList.length)
+    println(tweets.toArray.length)
+    Ok(Json.toJson(tweets)).enableCors
+  }
+
+
+
+  def getTweetsFromMongoDB(word: String): Action[AnyContent] = Action.async { implicit request =>
     val found = collection.map(_.find(Json.obj()).cursor[Tweet]())
     found.flatMap(_.collect[List]()).map { tweets =>
       var tweetsJSON = Json.toJson(tweets)

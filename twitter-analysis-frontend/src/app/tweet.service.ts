@@ -25,18 +25,8 @@ export class TweetService {
     this.messageSource.next(message);
   }
 
-  getTweets(): Promise<Tweet[]> {
-    this.http.get(this.backendUrl) // I'm adding this to test the connecttion to the backend without db
-      .toPromise()
-      .then (function(response){
-        console.log(response);
-      });
-    const tweetsJSON = this.http.get('http://' + window.location.hostname + ':9000/getAllTweets')
-      .toPromise()
-      .then(response => response.json() as Tweet[])
-      .catch(this.handleError);
-    tweetsJSON.then(tweets => this.tweets = tweets);
-    return tweetsJSON;
+  getTweets()  {
+    return this.tweets;
   }
 
   filterAllTweets() {
@@ -48,9 +38,14 @@ export class TweetService {
     this.subject.next(this.tweetsResult);
   }
 
-  filterTweetsWithText(text: string) {
-    this.tweetsResult = this.tweets.filter(tweet => tweet.content.includes(text));
-    this.subject.next(this.tweetsResult);
+  getTweetsWithWord(word: string): Promise<Tweet[]> {
+
+    const tweetsJSON = this.http.get('http://' + window.location.hostname + ':9000/getTweets/' + word)
+      .toPromise()
+      .then(response => response.json() as Tweet[])
+      .catch(this.handleError);
+    tweetsJSON.then(tweets => this.tweets = tweets);
+    return tweetsJSON;
   }
 
   getNumberOfTweets(quality: number) {
@@ -62,7 +57,12 @@ export class TweetService {
   }
 
   getAmountOfTweetsByMonth(): Array<number> {
-    return [10, 5, 0, -10, 5, -5, 10, 12, -20, 40, 35, 0, 30];
+
+    for (const tweet of this.tweets) { //Solved that
+      const date = new Date(tweet.timestamp);
+      const days = date.getDay();
+    }
+    return [10, 5, 0, -10, 5, -5, 10, 12, -20, 40, 35, 0, 3];
   }
 
   private handleError(error: any): Promise<any> {

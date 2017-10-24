@@ -6,8 +6,8 @@ import play.api.data.Forms._
 import play.api.data.validation.Constraints.pattern
 
 case class Tweet(
-                  id: Option[Long],
-                  timestamp: Option[Long],
+                  id: Long,
+                  timestamp: Long,
                   nickname: String,
                   content: String,
                   url: String,
@@ -33,8 +33,8 @@ object Tweet {
   implicit object ArticleReads extends Reads[Tweet] {
     def reads(json: JsValue): JsResult[Tweet] = json match {
       case obj: JsObject => try {
-        val id = (obj \ "id").asOpt[Long]
-        val timestamp = (obj \ "timestamp").asOpt[Long]
+        val id = (obj \ "id").as[Long]
+        val timestamp = (obj \ "timestamp").as[Long]
         val nickname = (obj \ "nickname").as[String]
         val content = (obj \ "content").as[String]
         val url = (obj \ "url").as[String]
@@ -52,8 +52,8 @@ object Tweet {
 
   val form = Form(
     mapping(
-      "id" -> optional(longNumber),
-      "timestamp" -> optional(longNumber),
+      "id" -> longNumber,
+      "timestamp" -> longNumber,
       "nickname" -> nonEmptyText,
       "content" -> text,
       "url" -> nonEmptyText,
