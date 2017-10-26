@@ -10,12 +10,39 @@ volumes:
  
 services:
 
-  mongo:
+  mongodb-1:
     image: mongo:3.4
     networks:
       - internal-net
     volumes:
       - mongo-vol:/data/db
+    # environment:
+      # - MONGODB_REPLICA_SET_MODE=primary
+
+  mongodb-2:
+    image: mongo:3.4
+    networks:
+      - internal-net
+    volumes:
+      - mongo-vol:/data/db
+    depends_on:
+      - mongodb-1
+    environment:
+      # - MONGODB_REPLICA_SET_MODE=secondary
+      - MONGODB_PRIMARY_HOST=mongodb-1
+
+  mongodb-3:
+    image: mongo:3.4
+    networks:
+      - internal-net
+    volumes:
+      - mongo-vol:/data/db
+    depends_on:
+      - mongodb-1
+    environment:
+      # - MONGODB_REPLICA_SET_MODE=arbiter
+      - MONGODB_PRIMARY_HOST=mongodb-1
+
 
   cassandra1:
     image: cassandra:3.0
