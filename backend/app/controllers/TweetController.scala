@@ -74,6 +74,9 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
     getFutureBogdan(2.second).map { msg => Ok(Json.obj("hey/"+index->msg)).enableCors }
   }
 
+  def bogdan2 = Action.async {
+    getFutureBogdan(1.second).map { msg => Ok(Json.obj("hey"->msg)).enableCors }
+  }
   private def getSentimentAnalysis(tweet: String): Int = {
     val words = tweet.split("\\s+")
     var sentimentAnalysisResult:Double = 0

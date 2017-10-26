@@ -21,3 +21,7 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 
 GET      /db/:id                    controllers.CassandraController.list(id: String)
 GET      /test/:id                    controllers.CassandraController.write(id: String)
+
+
+#testing purposes
+GET     /bogdan2                     controllers.TweetController.bogdan2
