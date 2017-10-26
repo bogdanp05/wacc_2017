@@ -21,15 +21,12 @@ services:
     image: cassandra:3.0
     networks:
       - internal-net
-    ports:
-      - "7000:7000"
-      - "9042:9042"
     volumes:
       - cassandra-vol:/cassandraDB
 
   # Build the container using the Dockerfile provided by Play Framework
   backend:
-      build: ./backend/target/docker/stage
+      image: bogdanp05/backend:latest
       ports:
             - "9000:9000"
       networks:
@@ -37,23 +34,21 @@ services:
       environment:
             - MONGO_ENV= "mongodb://mongo:27017/tweetsdb"
             - CASSANDRA_ENV= "cassandradb://cassandra:9042"
+      links:
+            - mongo
+            - cassandra
 
   # Build the container using the client Dockerfile
-  client:
-       build: ./twitter-analysis-frontend
-       # ports:
-       #    - "4200:4200"
-       # networks:
-       #    - isolation-network
+  frontend:
+       image: bogdanp05/frontend:latest
 
   # Build the container using the nginx Dockerfile
   nginx:
-    build: ./nginx
+    image: bogdanp05/nginx:latest
     # Map Nginx port 80 to the local machine's port 4200
     ports:
-      - "4200:80"
-      # - "9000:9000"  
+      - "80:80"  
     # Link the client container so that Nginx will have access to it
     links:
       - backend
-      - client
+      - frontend

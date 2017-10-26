@@ -1,0 +1,20 @@
+gcloud init
+gcloud config set project wacc-team-16
+gcloud config set compute/zone europe-west1-b
+gcloud compute project-info describe
+gcloud container clusters create team16-cluster1 --num-nodes=3
+gcloud compute instances list
+
+install kompose https://kubernetes.io/docs/tools/kompose/user-guide/#kubernetes--compose--kompose
+
+
+make build
+
+gcloud auth application-default login
+export GOOGLE_APPLICATION_CREDENTIALS='/home/bogdan/googleapicred/wacc-team-16-1bfbe94e1e2d.json'
+kompose -f ./docker-compose.yml up
+kompose -f ./docker-compose.yml down
+
+kubectl get deployment,svc,pods,pvc
+
+kubectl patch service nginx -p '{"spec":{"type":"LoadBalancer"}}'
