@@ -17,15 +17,40 @@ services:
     volumes:
       - mongo-vol:/data/db
 
-  cassandra:
+  cassandra1:
     image: cassandra:3.0
+    container_name: cassandra1
     networks:
       - internal-net
     ports:
-      - "7000:7000"
       - "9042:9042"
     volumes:
-      - cassandra-vol:/cassandraDB
+      - cassandra-vol:/cassandraDB/data/db
+
+  cassandra2:
+    image: cassandra:3.0
+    container_name: cassandra2
+    networks:
+      - internal-net
+    volumes:
+      - cassandra-vol:/cassandraDB/data/db
+    links:
+     - cassandra1:seed
+    environment:
+     - CASSANDRA_SEEDS=seed
+
+  cassandra3:
+    image: cassandra:3.0
+    container_name: cassandra3
+    networks:
+      - internal-net
+    volumes:
+      - cassandra-vol:/cassandraDB/data/db
+    links:
+     - cassandra1:seed
+    environment:
+     - CASSANDRA_SEEDS=seed
+
 
   # Build the container using the Dockerfile provided by Play Framework
   backend:
