@@ -10,7 +10,7 @@ volumes:
  
 services:
 
-  mongodb-1:
+  mongo:
     image: mongo:3.4
     networks:
       - internal-net
@@ -19,32 +19,32 @@ services:
     # environment:
       # - MONGODB_REPLICA_SET_MODE=primary
 
-  mongodb-2:
-    image: mongo:3.4
-    networks:
-      - internal-net
-    volumes:
-      - mongo-vol:/data/db
-    depends_on:
-      - mongodb-1
-    environment:
-      # - MONGODB_REPLICA_SET_MODE=secondary
-      - MONGODB_PRIMARY_HOST=mongodb-1
+  # mongodb-2:
+  #   image: mongo:3.4
+  #   networks:
+  #     - internal-net
+  #   volumes:
+  #     - mongo-vol:/data/db
+  #   depends_on:
+  #     - mongodb-1
+  #   environment:
+  #     # - MONGODB_REPLICA_SET_MODE=secondary
+  #     - MONGODB_PRIMARY_HOST=mongodb-1
 
-  mongodb-3:
-    image: mongo:3.4
-    networks:
-      - internal-net
-    volumes:
-      - mongo-vol:/data/db
-    depends_on:
-      - mongodb-1
-    environment:
-      # - MONGODB_REPLICA_SET_MODE=arbiter
-      - MONGODB_PRIMARY_HOST=mongodb-1
+  # mongodb-3:
+  #   image: mongo:3.4
+  #   networks:
+  #     - internal-net
+  #   volumes:
+  #     - mongo-vol:/data/db
+  #   depends_on:
+  #     - mongodb-1
+  #   environment:
+  #     # - MONGODB_REPLICA_SET_MODE=arbiter
+  #     - MONGODB_PRIMARY_HOST=mongodb-1
 
 
-  cassandra1:
+  cassandra:
     image: cassandra:3.0
     container_name: cassandra1
     networks:
@@ -54,29 +54,29 @@ services:
     volumes:
       - cassandra-vol:/cassandraDB/data/db
 
-  cassandra2:
-    image: cassandra:3.0
-    container_name: cassandra2
-    networks:
-      - internal-net
-    volumes:
-      - cassandra-vol:/cassandraDB/data/db
-    links:
-     - cassandra1:seed
-    environment:
-     - CASSANDRA_SEEDS=seed
+  # cassandra2:
+  #   image: cassandra:3.0
+  #   container_name: cassandra2
+  #   networks:
+  #     - internal-net
+  #   volumes:
+  #     - cassandra-vol:/cassandraDB/data/db
+  #   links:
+  #    - cassandra1:seed
+  #   environment:
+  #    - CASSANDRA_SEEDS=seed
 
-  cassandra3:
-    image: cassandra:3.0
-    container_name: cassandra3
-    networks:
-      - internal-net
-    volumes:
-      - cassandra-vol:/cassandraDB/data/db
-    links:
-     - cassandra1:seed
-    environment:
-     - CASSANDRA_SEEDS=seed
+  # cassandra3:
+  #   image: cassandra:3.0
+  #   container_name: cassandra3
+  #   networks:
+  #     - internal-net
+  #   volumes:
+  #     - cassandra-vol:/cassandraDB/data/db
+  #   links:
+  #    - cassandra1:seed
+  #   environment:
+  #    - CASSANDRA_SEEDS=seed
 
 
   # Build the container using the Dockerfile provided by Play Framework

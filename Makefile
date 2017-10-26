@@ -16,7 +16,7 @@ remove:
 
 
 
-# A normal order should be something like: build, push, kompose-up, kompose-down
+# A normal order should be something like: build, push, deploy, undeploy
 
 
 # Stop and remove all the containers
