@@ -47,31 +47,7 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
   }
 
   def bogdan = Action.async {
-
-    val result = collection.map(_.find(Json.obj("id"->2))).onComplete(
-      results => println("result  "+ results)
-    )
-
-
-    //collection.map(_.insert(Tweet(Some(1.toLong),Some(2.toLong),"a","b","c",0)))
-
-    val filename = "../tweetsdb.csv"
-    var index = 0
-    for (line <- Source.fromFile(filename, "ISO-8859-1").getLines) {
-      index = index + 1
-      val cols = line.split(";").map(_.trim)
-      /*
-      * Tweet Id;Date;Hour;Nickname;Tweet content;Tweet Url
-      * 0:ID    1:DATE     2:HOUR     3:NICKNAME     4:CONTENT    5:URL
-      * */
-      if (cols.length.equals(6)) {
-        if (cols(4).toLowerCase.contains("gop")) {
-          //println(getSentimentAnalysis(cols(4).toLowerCase))
-        }
-      }
-
-    }
-    getFutureBogdan(2.second).map { msg => Ok(Json.obj("hey/"+index->msg)).enableCors }
+    getFutureBogdan(2.second).map { msg => Ok(Json.obj("hey"->msg)).enableCors }
   }
 
   def bogdan2 = Action.async {
@@ -113,7 +89,7 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
       * 0:ID    1:DATE     2:HOUR     3:NICKNAME     4:CONTENT    5:URL
       * */
       if (cols.length.equals(6)) {
-        if (cols(4).toLowerCase.contains(word.toLowerCase)) {
+        if (this.needTweet(cols(4),word)) {
           var dt = DateTime.parse(cols(1)+" "+cols(2), DateTimeFormat.forPattern("yyyy-MM-dd HH:mm"))
           var analysis = this.getSentimentAnalysis(cols(4))
           var tweet = Tweet(cols(0).toLong, dt.getMillis(),cols(3),cols(4),cols(5),analysis)
@@ -122,12 +98,23 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
           println(tweet)
           println(tweets.toArray.length)
         }
-
       }
     }
     println(tweets.toList.length)
     println(tweets.toArray.length)
     Ok(Json.toJson(tweets)).enableCors
+  }
+
+  def needTweet(tweet: String, wordToSearch: String): Boolean = {
+    val words = tweet.split("\\s+")
+    for(word <- words){
+      if (word.toLowerCase.equals(wordToSearch.toLowerCase)
+        || word.toLowerCase.equals("#"+wordToSearch.toLowerCase)
+        || word.toLowerCase.equals("@"+wordToSearch.toLowerCase)) {
+        return true
+      }
+    }
+    return false
   }
 
 
