@@ -5,8 +5,16 @@ In order to deploy to Google Cloud PLatform:
 - Install: docker, docker-compose, gcloud, kubectl, kompose
 - Create account on Google Cloud Platform
 - Create a project and get key to configure your environment (see guides on how to do it)
-- 'make build' : create images for backend, frontend, nginx 
-- 'make push' : publish these private images to docker hub
-- 'make deploy' : deploy to GCP
-- 'make undeploy' : undeploy
 
+
+To run the containers locally:
+- 'make clear' : deletes all the containers
+- 'make local' : build the images and creates the containers
+
+To deploy the containers on GCP:
+- 'make undeploy'
+- 'make deploy'
+
+Debugging:
+- docker exec -t -i 5af8c4b35e8b /bin/bash
+- docker logs docker exec -t -i 5af8c4b35e8b /bin/bash

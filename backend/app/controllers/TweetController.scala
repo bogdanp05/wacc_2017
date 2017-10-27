@@ -18,6 +18,7 @@ import models.{SentimentAnalysis, Tweet}
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import scala.collection.mutable.ListBuffer
+import play.api.Logger
 
 import scala.io.Source
 
@@ -80,7 +81,14 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
 
 
   def getTweets(word: String) = Action {
-    val filename = "../tweetsdb.csv"
+    val currentDirectory = new java.io.File(".").getCanonicalPath
+    //Use Logger instead of println
+    Logger.info("--------" + currentDirectory)
+
+    //val filename = "../tweetsdb.csv"
+    // This is the path in the docker container. If you want to develop without docker,
+    // you can change back the path everytime, or put the file on your machine at the same path
+    val filename = "/var/lib/dataset/tweetsdb.csv"
     val tweets = ListBuffer[Tweet]()
     for (line <- Source.fromFile(filename, "ISO-8859-1").getLines) {
       val cols = line.split(";").map(_.trim)
@@ -95,13 +103,13 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
           var tweet = Tweet(cols(0).toLong, dt.getMillis(),cols(3),cols(4),cols(5),analysis)
           var tweetJSON = Json.toJson(tweet)
           tweets += tweet
-          println(tweet)
-          println(tweets.toArray.length)
+          //println(tweet)
+          //println(tweets.toArray.length)
         }
       }
     }
-    println(tweets.toList.length)
-    println(tweets.toArray.length)
+//    println(tweets.toList.length)
+//    println(tweets.toArray.length)
     Ok(Json.toJson(tweets)).enableCors
   }
 

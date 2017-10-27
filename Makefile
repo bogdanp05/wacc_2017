@@ -16,9 +16,6 @@ remove:
 
 
 
-# A normal order should be something like: build, push, deploy, undeploy
-
-
 # Stop and remove all the containers
 clear:
 	@docker stop $(shell docker ps -aq)
@@ -26,7 +23,7 @@ clear:
 
 # Build all the containers
 compose:
-	#@(cd ./backend && sbt docker:publishLocal)
+	# @(cd ./backend && sbt docker:publishLocal)
 	@docker-compose up -d --build --remove-orphans
 
 # Build images and tag them
@@ -51,3 +48,6 @@ deploy:
 undeploy:
 	@kompose down
 
+local: build compose
+
+cloud: build push deploy
