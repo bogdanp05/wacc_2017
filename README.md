@@ -14,6 +14,7 @@ To run the containers locally:
 To deploy the containers on GCP:
 - 'make undeploy'
 - 'make deploy'
+- 'kubectl get deployment,svc,pods,pvc' to see the ip address that you need to access
 
 Debugging:
 - docker exec -t -i 5af8c4b35e8b /bin/bash
