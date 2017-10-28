@@ -16,6 +16,14 @@ To deploy the containers on GCP:
 - 'make deploy'
 - 'kubectl get deployment,svc,pods,pvc' to see the ip address that you need to access
 
-Debugging:
+Debugging local:
+- docker logs $(CONTAINER_ID)
 - docker exec -t -i 5af8c4b35e8b /bin/bash
 - docker logs docker exec -t -i 5af8c4b35e8b /bin/bash
+
+Debugging on cloud:
+- kubectl get pods --all-namespaces -o=jsonpath='{range .items[*]}{"\n"}{.metadata.name}{":\t"}{range .spec.containers[*]}{.image}{", "}{end}{end}' |\
+sort
+
+- kubectl logs backend-3573919465-b9t1
+- kubectl exec -t -i backend-3573919465-b9t19 /bin/bash

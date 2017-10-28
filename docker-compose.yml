@@ -90,8 +90,10 @@ services:
       # environment:
       #       - MONGO_ENV= "mongodb://mongo:27017/tweetsdb"
       #       - CASSANDRA_ENV= "cassandradb://cassandra:9042"
+      # volumes:
+      #       - "./tweetsdb.csv:/var/lib/dataset/tweetsdb.csv"
       volumes:
-            - "./tweetsdb.csv:/var/lib/dataset/tweetsdb.csv"
+            - ./dataset:/var/lib/dataset 
       links:
             - mongo
             - cassandra
@@ -113,3 +115,4 @@ services:
     # Link the client container so that Nginx will have access to it
     links:
       - frontend
+      - backend

@@ -39,8 +39,8 @@ export class TweetService {
   }
 
   getTweetsWithWord(word: string): Promise<Tweet[]> {
-
-    const tweetsJSON = this.http.get('http://' + window.location.hostname + ':9000/getTweets/' + word)
+    console.log('http://' + window.location.hostname + '/api/getTweets/' + word);
+    const tweetsJSON = this.http.get('http://' + window.location.hostname + '/api/getTweets/' + word)
       .toPromise()
       .then(response => response.json() as Tweet[])
       .catch(this.handleError);

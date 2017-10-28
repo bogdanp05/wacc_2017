@@ -16,6 +16,10 @@ remove:
 
 
 
+# Deletes all the volumes except for the ones in use
+volumesDelete:
+	@docker volume rm $(shell docker volume ls -q)
+
 # Stop and remove all the containers
 clear:
 	@docker stop $(shell docker ps -aq)
