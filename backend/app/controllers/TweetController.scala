@@ -125,24 +125,36 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
     return false
   }
 
+  // select tweets from mongodb
+  def mongoGetTweets() = {
+    val found = collection.map(_.find(Json.obj()).cursor[Tweet]())
+    found.flatMap(_.collect[List]())
+}
 
 
   def getTweetsFromMongoDB(word: String): Action[AnyContent] = Action.async { implicit request =>
-    val found = collection.map(_.find(Json.obj()).cursor[Tweet]())
-    found.flatMap(_.collect[List]()).map { tweets =>
-      var tweetsJSON = Json.toJson(tweets)
+    val found = mongoGetTweets()
+    found.map { tweets =>
+      val tweetsJSON = Json.toJson(tweets)
       Ok(tweetsJSON).enableCors
     }.recover {
       case e =>
         e.printStackTrace()
         BadRequest(e.getMessage())
-    }
+            }
   }
 
-  def getAllTweets(): Action[AnyContent] = Action.async { implicit request =>
+  // get all tweets from mongodb
+  def mongoGetAllTweets() = {
     val found = collection.map(_.find(Json.obj()).cursor[Tweet]())
-    found.flatMap(_.collect[List]()).map { tweets =>
-      var tweetsJSON = Json.toJson(tweets)
+    found.flatMap(_.collect[List]())
+  }
+
+
+  def getAllTweets(): Action[AnyContent] = Action.async { implicit request =>
+    val found = mongoGetAllTweets()
+    found.map { tweets =>
+      val tweetsJSON = Json.toJson(tweets)
       Ok(tweetsJSON).enableCors
     }.recover {
       case e =>
