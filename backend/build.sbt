@@ -1,3 +1,4 @@
+import com.typesafe.sbt.packager.docker.{Cmd, ExecCmd}
 
 name := "backend"
  
@@ -39,6 +40,17 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-parser" % "0.8.0")
 
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )
+
+dockerCommands := Seq(
+  Cmd("FROM", "openjdk:latest"),
+  Cmd("WORKDIR", "/opt/docker"),
+  Cmd("ADD", "opt", "/opt"),
+  Cmd("COPY", "dataset", "/var/lib/dataset"),
+  Cmd("RUN", "[\"chown\", \"-R\", \"daemon:daemon\", \".\"]"),
+  Cmd("USER", "daemon"),
+  Cmd("ENTRYPOINT", "[\"bin/backend\"]"),
+  ExecCmd("CMD")
+)
 
 
 

@@ -6,7 +6,8 @@ networks:
 
 volumes:
   mongo-vol: {}
-  cassandra-vol: {}  
+  cassandra-vol: {}
+
  
 services:
 
@@ -85,15 +86,6 @@ services:
       image: bogdanp05/backend:latest
       ports:
             - "9000:9000"
-      # networks:
-      #       - internal-net
-      # environment:
-      #       - MONGO_ENV= "mongodb://mongo:27017/tweetsdb"
-      #       - CASSANDRA_ENV= "cassandradb://cassandra:9042"
-      # volumes:
-      #       - "./tweetsdb.csv:/var/lib/dataset/tweetsdb.csv"
-      volumes:
-            - ./dataset:/var/lib/dataset 
       links:
             - mongo
             - cassandra

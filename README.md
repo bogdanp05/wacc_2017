@@ -6,6 +6,7 @@ In order to deploy to Google Cloud PLatform:
 - Create account on Google Cloud Platform
 - Create a project and get key to configure your environment (see guides on how to do it)
 
+IMPORTANT: Copy ./dataset directory to ./backend/target/docker/stage .
 
 To run the containers locally:
 - 'make clear' : deletes all the containers
