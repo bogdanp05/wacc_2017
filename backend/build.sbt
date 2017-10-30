@@ -22,9 +22,9 @@ libraryDependencies ++= Seq(
   jdbc ,
   ehcache ,
   ws ,
-  specs2 % Test ,
   guice,
   "org.reactivemongo" %% "play2-reactivemongo" % "0.12.6-play26",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "test",
 
   // connector of cassandra
   "com.datastax.cassandra" % "cassandra-driver-core" % "3.3.0",
