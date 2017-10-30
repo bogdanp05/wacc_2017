@@ -6,7 +6,7 @@ In order to deploy to Google Cloud PLatform:
 - Create account on Google Cloud Platform
 - Create a project and get key to configure your environment (see guides on how to do it)
 
-IMPORTANT: Copy ./dataset directory to ./backend/target/docker/stage .
+IMPORTANT: Copy ./dataset directory to ./backend/target/docker/stage . If the destination dir does not exist, just run 'sbt docker:publishLocal' in the terminal. This will fail but will create the needed directory.
 
 To run the containers locally:
 - 'make clear' : deletes all the containers
