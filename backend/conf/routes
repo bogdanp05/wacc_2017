@@ -18,4 +18,8 @@ GET     /getTweets/:word            controllers.TweetController.getTweets(word: 
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 GET      /db/:id                    controllers.CassandraController.list(id: String)
-#GET      /test/:id                    controllers.CassandraController.write(id: String)
+GET      /test/:id                    controllers.CassandraController.write(id: String)
+
+
+#testing purposes
+GET     /bogdan2                     controllers.TweetController.bogdan2

@@ -1,6 +1,16 @@
-1. When everything in containers connect to mongo
-2. When everything in containers connect to casssandra
-3. All should work in containers
-4. Deployment on Google Cloud with Kubernetes
-5. Replication.
-6. Get data from csv and put in mongo and cass(analysis).
+1. Test Mongo connection works (should work now)
+2. !!! Insert into Mongo
+3. !!! Read from Mongo
+4. !!! Insert into Cassandra
+5. !!! Read from Cassandra
+6. ! Use Web Sockets. Must be implemented in both backend and frontend
+7. Replication / fault tolerance
+8. Grant access to GCP project (Bogdan)
+9. Frontend: make graph work
+10. Fe: Search word at enter
+11. Fe: Display list of words at search
+12. Fe: Update list when new word is searched
+
+13. !!! Report !!! (Friday)
+
+14. Message Queue & Service discovery (depending on time)

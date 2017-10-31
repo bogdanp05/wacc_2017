@@ -18,6 +18,8 @@ import reactivemongo.play.json.collection._
 import models.{AnalysisResults, SentimentAnalysis, Tweet}
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
+import scala.collection.mutable.ListBuffer
+import play.api.Logger
 
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
@@ -52,6 +54,9 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
     getFutureBogdan(2.second).map { msg => Ok(Json.obj("hey"->msg)).enableCors }
   }
 
+  def bogdan2 = Action.async {
+    getFutureBogdan(1.second).map { msg => Ok(Json.obj("hey"->msg)).enableCors }
+  }
   private def getSentimentAnalysis(tweet: String): Int = {
     val words = tweet.split("\\s+")
     var sentimentAnalysisResult:Double = 0
@@ -79,7 +84,14 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
 
 
   def getTweets(word: String) = Action {
-    val filename = "../tweetsdb.csv"
+    val currentDirectory = new java.io.File(".").getCanonicalPath
+    //Use Logger instead of println
+    Logger.info("--------" + currentDirectory)
+
+    //val filename = "../tweetsdb.csv"
+    // This is the path in the docker container. If you want to develop without docker,
+    // you can change back the path everytime, or put the file on your machine at the same path
+    val filename = "/var/lib/dataset/tweetsdb.csv"
     val tweets = ListBuffer[Tweet]()
     for (line <- Source.fromFile(filename, "ISO-8859-1").getLines) {
       val cols = line.split(";").map(_.trim)
@@ -114,10 +126,36 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
     return false
   }
 
-  def getTweetsFromMongoDB(word: String): Action[AnyContent] = Action.async { implicit request =>
+  // select tweets from mongodb
+  def mongoGetTweets() = {
     val found = collection.map(_.find(Json.obj()).cursor[Tweet]())
-    found.flatMap(_.collect[List]()).map { tweets =>
-      var tweetsJSON = Json.toJson(tweets)
+    found.flatMap(_.collect[List]())
+}
+
+
+  def getTweetsFromMongoDB(word: String): Action[AnyContent] = Action.async { implicit request =>
+    val found = mongoGetTweets()
+    found.map { tweets =>
+      val tweetsJSON = Json.toJson(tweets)
+      Ok(tweetsJSON).enableCors
+    }.recover {
+      case e =>
+        e.printStackTrace()
+        BadRequest(e.getMessage())
+            }
+  }
+
+  // get all tweets from mongodb
+  def mongoGetAllTweets() = {
+    val found = collection.map(_.find(Json.obj()).cursor[Tweet]())
+    found.flatMap(_.collect[List]())
+  }
+
+
+  def getAllTweets(): Action[AnyContent] = Action.async { implicit request =>
+    val found = mongoGetAllTweets()
+    found.map { tweets =>
+      val tweetsJSON = Json.toJson(tweets)
       Ok(tweetsJSON).enableCors
     }.recover {
       case e =>
