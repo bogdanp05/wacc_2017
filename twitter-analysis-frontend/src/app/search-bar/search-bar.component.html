@@ -1,11 +1,11 @@
 <div class="container" id="search-bar-container-id">
   <div class="search-bar-container">
     <div class="search-bar" id="search-bar">
-      <input #searchBox type="text" class="form-control input-sm" maxlength="150" placeholder="Search"  />
+      <input #searchBox type="text" class="form-control input-sm" maxlength="150"
+      placeholder="Search" (keyup.enter)="search(searchBox.value)" />
     </div>
-    <button id= "search-bar-button" type="submit" class="btn btn-primary btn-sm" (click)="search(searchBox.value)">Search </button>
+    <button id= "search-bar-button" type="submit" class="btn btn-primary btn-sm"
+    (click)="search(searchBox.value)">Search </button>
 
   </div>
 </div>
-
-

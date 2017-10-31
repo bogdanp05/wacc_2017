@@ -1,9 +1,5 @@
 version: '2'
 
-networks:
-  internal-net:
-    driver: bridge
-
 volumes:
   mongo-vol: {}
   cassandra-vol: {}

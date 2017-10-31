@@ -23,7 +23,6 @@ export class TweetsTableComponent implements OnInit {
     this.tweetService.subject.subscribe(
       goodTweets => this.tweets = goodTweets
     );
-    console.log(this.tweets)
     this.getTweets();
   }
 

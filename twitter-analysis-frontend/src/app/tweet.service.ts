@@ -44,7 +44,8 @@ export class TweetService {
       .toPromise()
       .then(response => response.json() as Tweet[])
       .catch(this.handleError);
-    tweetsJSON.then(tweets => this.tweets = tweets);
+    tweetsJSON.then(tweets => this.tweets = tweets)
+              .then(() => this.filterAllTweets());
     return tweetsJSON;
   }
 
