@@ -1,5 +1,7 @@
 package models
 
+import java.util.Dictionary
+
 import play.api.libs.json.Json
 
 /**

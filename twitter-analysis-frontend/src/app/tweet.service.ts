@@ -58,11 +58,55 @@ export class TweetService {
 
   getAmountOfTweetsByMonth(): Array<number> {
 
+    const analysisArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     for (const tweet of this.tweets) { //Solved that
       const date = new Date(tweet.timestamp);
-      const days = date.getDay();
+      const day = date.getDay();
+      const hour = date.getHours();
+
+      const firstArrayPosition = (day - 4) * 4;
+      if (hour >= 0 && hour <= 6) {
+        if (tweet.analysis === 1) {
+          analysisArray[firstArrayPosition] += 1;
+        }
+        else if (tweet.analysis === -1) {
+          analysisArray[firstArrayPosition] -= 1;
+        }
+      }
+      else if (hour > 6 && hour <= 12) {
+        if (tweet.analysis === 1) {
+          analysisArray[firstArrayPosition + 1] += 1;
+        }
+        else if (tweet.analysis === -1) {
+          analysisArray[firstArrayPosition + 1] -= 1;
+        }
+      }
+      else if (hour > 12 && hour <= 18) {
+        if (tweet.analysis === 1) {
+          analysisArray[firstArrayPosition + 2] += 1;
+        }
+        else if (tweet.analysis === -1) {
+          analysisArray[firstArrayPosition + 2] -= 1;
+        }
+      }
+      else if (hour > 18 && hour <= 23) {
+        if (tweet.analysis === 1) {
+          analysisArray[firstArrayPosition + 3] += 1;
+        }
+        else if (tweet.analysis === -1) {
+          analysisArray[firstArrayPosition + 3] -= 1;
+        }
+      }
+
+
     }
-    return [10, 5, 0, -10, 5, -5, 10, 12, -20, 40, 35, 0, 3];
+    /*
+    * Diagram
+    * 0: 04/../....   1: 6h    2: 12h     3: 18h
+    * 4: 05/../....   5: 6h    6: 12h     7: 18h
+    * 8: 06/../....   9: 6h    10: 12h   11: 18h
+    * */
+    return analysisArray;
   }
 
   private handleError(error: any): Promise<any> {

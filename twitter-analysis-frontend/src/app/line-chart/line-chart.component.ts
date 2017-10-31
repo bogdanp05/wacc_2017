@@ -39,8 +39,6 @@ export class LineChartComponent implements OnInit  {
     ];
   }
 
-
-
   getAmountOfTweetsByMonth(): Array<number> {
     return this.tweetService.getAmountOfTweetsByMonth();
   }

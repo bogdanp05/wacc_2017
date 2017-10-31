@@ -1,5 +1,6 @@
 package controllers
 
+import java.util.Dictionary
 import javax.inject._
 
 import akka.actor.ActorSystem
@@ -14,12 +15,13 @@ import reactivemongo.api.gridfs.{GridFS, ReadFile}
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
 import reactivemongo.play.json._
 import reactivemongo.play.json.collection._
-import models.{SentimentAnalysis, Tweet}
+import models.{AnalysisResults, SentimentAnalysis, Tweet}
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import scala.collection.mutable.ListBuffer
 
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
+import connectors.AnalysisDB
 
 @Singleton
 class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: ControllerComponents, actorSystem: ActorSystem)(implicit exec: ExecutionContext)
@@ -81,10 +83,7 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
     val tweets = ListBuffer[Tweet]()
     for (line <- Source.fromFile(filename, "ISO-8859-1").getLines) {
       val cols = line.split(";").map(_.trim)
-      /*
-      * Tweet Id;Date;Hour;Nickname;Tweet content;Tweet Url
-      * 0:ID    1:DATE     2:HOUR     3:NICKNAME     4:CONTENT    5:URL
-      * */
+      /* 0:ID    1:DATE     2:HOUR     3:NICKNAME     4:CONTENT    5:URL */
       if (cols.length.equals(6)) {
         if (this.needTweet(cols(4),word)) {
           var dt = DateTime.parse(cols(1)+" "+cols(2), DateTimeFormat.forPattern("yyyy-MM-dd HH:mm"))
@@ -92,13 +91,14 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
           var tweet = Tweet(cols(0).toLong, dt.getMillis(),cols(3),cols(4),cols(5),analysis)
           var tweetJSON = Json.toJson(tweet)
           tweets += tweet
-          println(tweet)
-          println(tweets.toArray.length)
         }
       }
     }
     println(tweets.toList.length)
     println(tweets.toArray.length)
+    //save tweets to cassandra
+
+    //save tweets to mongoDB
     Ok(Json.toJson(tweets)).enableCors
   }
 
@@ -114,21 +114,7 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
     return false
   }
 
-
-
   def getTweetsFromMongoDB(word: String): Action[AnyContent] = Action.async { implicit request =>
-    val found = collection.map(_.find(Json.obj()).cursor[Tweet]())
-    found.flatMap(_.collect[List]()).map { tweets =>
-      var tweetsJSON = Json.toJson(tweets)
-      Ok(tweetsJSON).enableCors
-    }.recover {
-      case e =>
-        e.printStackTrace()
-        BadRequest(e.getMessage())
-    }
-  }
-
-  def getAllTweets(): Action[AnyContent] = Action.async { implicit request =>
     val found = collection.map(_.find(Json.obj()).cursor[Tweet]())
     found.flatMap(_.collect[List]()).map { tweets =>
       var tweetsJSON = Json.toJson(tweets)
