@@ -17,9 +17,10 @@ GET     /getTweets/:word            controllers.TweetController.getTweets(word: 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
-GET      /db/:id                    controllers.CassandraController.list(id: String)
-GET      /test/:id                    controllers.CassandraController.write(id: String)
-
+GET      /db/:id                    controllers.DBtest.list(id: String)
+GET      /test/:id                    controllers.DBtest.write(id: String)
+GET      /mongo/:word                 controllers.DBtest.list_mongo(word: String)
+GET      /test2/:word                 controllers.DBtest.insert_mongo(word: String)
 
 #testing purposes
 GET     /bogdan2                     controllers.TweetController.bogdan2

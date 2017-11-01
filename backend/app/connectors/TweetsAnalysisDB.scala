@@ -15,6 +15,8 @@ import scala.concurrent.duration.Duration
   */
 
 class TweetsAnalysisDB (override val connector: CassandraConnection) extends Database[TweetsAnalysisDB](connector){
+
+
   object AnalysisResultsModel extends AnalysisResultsModel with connector.Connector
 
   /**

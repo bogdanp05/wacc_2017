@@ -4,6 +4,8 @@ import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints.pattern
+import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
+import reactivemongo.bson.Macros.Annotations.Key
 
 case class Tweet(
                   id: Long,
@@ -18,6 +20,9 @@ case class Tweet(
 // It is not dying...
 object Tweet {
   import play.api.libs.json._
+
+  implicit val bsonRead: BSONDocumentReader[Tweet] = Macros.reader[Tweet]
+  implicit val bsonWrite: BSONDocumentWriter[Tweet] = Macros.writer[Tweet]
 
   implicit object ArticleWrites extends OWrites[Tweet] {
     def writes(tweet: Tweet): JsObject = Json.obj(

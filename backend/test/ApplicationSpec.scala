@@ -1,5 +1,8 @@
+import connectors.MongoDB
 import controllers.TweetController
+import models.Tweet
 import org.scalatestplus.play._
+import play.Logger
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test._
 import play.api.test.Helpers._
@@ -31,15 +34,27 @@ class ApplicationSpec extends PlaySpec with OneAppPerTest {
     }
   }
 
-////test mongodb
-//  "" should {
-//    ".." in{
-//
-//      val mongo = new GuiceApplicationBuilder().build().injector.instanceOf[TweetController]
-//      val tweets = Await.result(mongo.mongoGetAllTweets(), Duration.Inf)
-//      tweets.length must be > 0
-//    }
-//  }
+
+  //test mongodb
+  "MongoDB" should {
+    "insert and read info" in{
+
+      val test = new Tweet(10L, 32L, "AAA", "dog", "", 1)
+
+      val mongo = new GuiceApplicationBuilder().build().injector.instanceOf[MongoDB]
+
+      mongo.insert(test)
+      Thread.sleep(2000)
+
+      val read_tweets = Await.result(mongo.read(test.content), Duration.Inf)
+      Logger.debug(read_tweets.toString)
+      read_tweets.get.id mustBe 10L
+
+
+
+    }
+  }
+
 
 
 }

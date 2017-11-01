@@ -24,9 +24,10 @@ import play.api.Logger
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 import connectors.AnalysisDB
+import connectors.MongoDB
 
 @Singleton
-class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: ControllerComponents, actorSystem: ActorSystem)(implicit exec: ExecutionContext)
+class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: ControllerComponents, actorSystem: ActorSystem, mongoDB: MongoDB)(implicit exec: ExecutionContext)
   extends AbstractController(cc) with MongoController with ReactiveMongoComponents {
 
   type JSONReadFile = ReadFile[JSONSerializationPack.type, JsString]
@@ -131,7 +132,6 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
     val found = collection.map(_.find(Json.obj()).cursor[Tweet]())
     found.flatMap(_.collect[List]())
 }
-
 
   def getTweetsFromMongoDB(word: String): Action[AnyContent] = Action.async { implicit request =>
     val found = mongoGetTweets()
