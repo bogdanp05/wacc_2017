@@ -18,6 +18,7 @@ import reactivemongo.play.json.collection._
 import models.{AnalysisResults, SentimentAnalysis, Tweet}
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
+
 import scala.collection.mutable.ListBuffer
 import play.api.Logger
 
@@ -171,6 +172,31 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
     val timeInMillis = System.currentTimeMillis()
     AnalysisDB.saveOrUpdate(new AnalysisResults(timeInMillis, id, 123, 1, 123456789))
     Ok("working")
+  }
+
+  // MONGO DB FUNCTIONS
+
+  def list_mongo(word: String):Action[AnyContent] = Action.async { implicit req =>
+    Logger.debug("Called reading: " + word)
+
+    // read data
+    for {
+      ans <- mongoDB.read(word)
+    } yield {
+      Ok(Json.toJson(ans))
+    }
+  }
+
+
+  def insert_mongo(word: String):Action[AnyContent] = Action.async { implicit req =>
+    Logger.debug("Called reading: " + word)
+
+    // read data for test
+    for {
+      ans <- mongoDB.insert(new Tweet(10L, 32L, "AAA", word, "", 1))
+    } yield {
+      Ok(ans.toString())
+    }
   }
 
   implicit class RichResult (result: Result) {
