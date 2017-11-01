@@ -53,7 +53,7 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
   }
 
   def bogdan = Action.async {
-    this.write("dog")
+    this.write2("alex")
     getFutureBogdan(2.second).map { msg => Ok(Json.obj("hey"->msg)).enableCors }
   }
 
@@ -168,6 +168,13 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
   }
 
   def write(id:String) = Action {
+    AnalysisDB.start()
+    val timeInMillis = System.currentTimeMillis()
+    AnalysisDB.saveOrUpdate(new AnalysisResults(timeInMillis, id, 123, 1, 123456789))
+    Ok("working")
+  }
+
+  def write2(id:String) = Future {
     AnalysisDB.start()
     val timeInMillis = System.currentTimeMillis()
     AnalysisDB.saveOrUpdate(new AnalysisResults(timeInMillis, id, 123, 1, 123456789))
