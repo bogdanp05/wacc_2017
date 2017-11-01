@@ -7,34 +7,33 @@ abstract class AnalysisResultsModel extends Table[AnalysisResultsModel, Analysis
 
   override def tableName: String = "Analysis"
 
-  object id extends StringColumn with PartitionKey {
-    override lazy val name = "Analysis_id"
-  }
-
-  object keyword extends StringColumn with PrimaryKey
-  object tweet extends StringColumn
-  object value extends StringColumn
+  object id extends LongColumn with PrimaryKey
+  object keyword extends StringColumn with PartitionKey
+  object tweetID extends LongColumn
+  object analysis extends IntColumn
+  object timestamp extends LongColumn
 
   override def fromRow(row: Row): AnalysisResults = {
     AnalysisResults(
       id(row),
       keyword(row),
-      tweet(row),
-      value(row)
+      tweetID(row),
+      analysis(row),
+      timestamp(row)
     )
   }
 
 
   def getById(id: String): Future[List[AnalysisResults]] = {
     select
-      .where(_.id eqs id)
+      .where(_.keyword eqs id)
       .consistencyLevel_=(ConsistencyLevel.ONE)
       .fetch()
   }
 
   def getByIdAndKeyword(id: String, keyword: String): Future[Option[AnalysisResults]] = {
     select
-      .where(_.id eqs id).and(_.keyword eqs keyword)
+      .where(_.keyword eqs id).and(_.keyword eqs keyword)
       .consistencyLevel_=(ConsistencyLevel.ONE)
       .one()
   }

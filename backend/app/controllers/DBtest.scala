@@ -4,19 +4,21 @@ import javax.inject.Inject
 
 import connectors.{AnalysisDB, MongoDB}
 import models.{AnalysisResults, Tweet}
+import akka.actor.FSM.Failure
+import akka.actor.Status.Success
+import connectors.AnalysisDB
+import models.AnalysisResults
 import play.Logger
-import play.api.mvc.{AbstractController, ControllerComponents}
+import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import play.api.libs.json.Json
 
 import scala.concurrent.ExecutionContext
 
+final class CassandraController @Inject()(implicit ec: ExecutionContext, cc: ControllerComponents) extends AbstractController(cc){
 
-final class DBtest @Inject()(implicit ec: ExecutionContext, cc: ControllerComponents, mongoDB: MongoDB) extends AbstractController(cc){
-
-  def list(id: String) = Action.async { implicit req =>
+  def list(id: String): Action[AnyContent] = Action.async { implicit req =>
     Logger.debug("Called reading: " + id)
     AnalysisDB.start()
-
     // read data
     for {
       ans <- AnalysisDB.read(id)
@@ -25,16 +27,18 @@ final class DBtest @Inject()(implicit ec: ExecutionContext, cc: ControllerCompon
     }
   }
 
-  def write(id: String) = Action.async { implicit req =>
-    Logger.debug("Called reading: " + id)
-    AnalysisDB.start()
+    def write(id: String): Action[AnyContent] = Action.async { implicit req =>
+      Logger.debug("Called reading: " + id)
+      AnalysisDB.start()
 
-    // read data for test
-    for {
-      ans <- AnalysisDB.saveOrUpdate(new AnalysisResults(id, "123","aaa","1"))
-    } yield {
-      Ok(ans.toString())
-    }
+      val timeInMillis = System.currentTimeMillis()
+
+      for {
+        ans <- AnalysisDB.saveOrUpdate(new AnalysisResults(timeInMillis,id,123,1,123456789))
+
+      } yield {
+        Ok(ans.toString())
+      }
   }
 
   def list_mongo(word: String) = Action.async { implicit req =>

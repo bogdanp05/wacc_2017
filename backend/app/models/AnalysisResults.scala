@@ -10,10 +10,11 @@ import play.api.libs.json.Json
   */
 
 case class AnalysisResults(
-                            id: String,
-                            keyword: String,
-                            tweet: String,
-                            value: String
+                          id: Long,
+                          keyword: String,
+                          tweetID: Long,
+                          analysis: Int,
+                          timestamp: Long
                           )
 
 object AnalysisResults{

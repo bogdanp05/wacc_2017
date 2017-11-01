@@ -52,6 +52,7 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
   }
 
   def bogdan = Action.async {
+    this.write("dog")
     getFutureBogdan(2.second).map { msg => Ok(Json.obj("hey"->msg)).enableCors }
   }
 
@@ -99,17 +100,15 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
       /* 0:ID    1:DATE     2:HOUR     3:NICKNAME     4:CONTENT    5:URL */
       if (cols.length.equals(6)) {
         if (this.needTweet(cols(4),word)) {
-          var dt = DateTime.parse(cols(1)+" "+cols(2), DateTimeFormat.forPattern("yyyy-MM-dd HH:mm"))
-          var analysis = this.getSentimentAnalysis(cols(4))
-          var tweet = Tweet(cols(0).toLong, dt.getMillis(),cols(3),cols(4),cols(5),analysis)
-          var tweetJSON = Json.toJson(tweet)
+          val dt = DateTime.parse(cols(1)+" "+cols(2), DateTimeFormat.forPattern("yyyy-MM-dd HH:mm"))
+          val analysis = this.getSentimentAnalysis(cols(4))
+          val tweet = Tweet(cols(0).toLong, dt.getMillis(),cols(3),cols(4),cols(5),analysis)
+          //save tweets to cassandra
+          val tweetJSON = Json.toJson(tweet)
           tweets += tweet
         }
       }
     }
-    println(tweets.toList.length)
-    println(tweets.toArray.length)
-    //save tweets to cassandra
 
     //save tweets to mongoDB
     Ok(Json.toJson(tweets)).enableCors
@@ -135,6 +134,7 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
 
   def getTweetsFromMongoDB(word: String): Action[AnyContent] = Action.async { implicit request =>
     val found = mongoGetTweets()
+
     found.map { tweets =>
       val tweetsJSON = Json.toJson(tweets)
       Ok(tweetsJSON).enableCors
@@ -145,22 +145,16 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
             }
   }
 
-  // get all tweets from mongodb
-  def mongoGetAllTweets() = {
-    val found = collection.map(_.find(Json.obj()).cursor[Tweet]())
-    found.flatMap(_.collect[List]())
-  }
+  // CASSANDRA FUNCTIONS
 
-
-  def getAllTweets(): Action[AnyContent] = Action.async { implicit request =>
-    val found = mongoGetAllTweets()
-    found.map { tweets =>
-      val tweetsJSON = Json.toJson(tweets)
-      Ok(tweetsJSON).enableCors
-    }.recover {
-      case e =>
-        e.printStackTrace()
-        BadRequest(e.getMessage())
+  def list(id: String): Action[AnyContent] = Action.async { implicit req =>
+    Logger.debug("Called reading: " + id)
+    AnalysisDB.start()
+    // read data
+    for {
+      ans <- AnalysisDB.read(id)
+    } yield {
+      Ok(Json.toJson(ans))
     }
   }
 
@@ -170,6 +164,13 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
       promise.success("Bogdan async2")
     }(actorSystem.dispatcher) // run scheduled tasks using the actor system's dispatcher
     promise.future
+  }
+
+  def write(id:String) = Action {
+    AnalysisDB.start()
+    val timeInMillis = System.currentTimeMillis()
+    AnalysisDB.saveOrUpdate(new AnalysisResults(timeInMillis, id, 123, 1, 123456789))
+    Ok("working")
   }
 
   implicit class RichResult (result: Result) {
