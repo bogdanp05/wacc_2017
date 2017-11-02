@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class MongoDB @Inject()(implicit ec: ExecutionContext, val reactiveMongoApi: ReactiveMongoApi){
 
   private val COLLECTION = "tweets"
-  private val TWEETS = "content"
+  private val TWEETS = "nickname"
 
 
   private def Collection: Future[BSONCollection] = reactiveMongoApi.database.map(_.collection(COLLECTION))
@@ -28,9 +28,9 @@ class MongoDB @Inject()(implicit ec: ExecutionContext, val reactiveMongoApi: Rea
       }
   }
 
-  def read(word: String): Future[Option[Tweet]] = {
+  def read(tweetID: Long): Future[Option[Tweet]] = {
     Collection.flatMap(_
-      .find(BSONDocument(TWEETS -> word ))
+      .find(BSONDocument("id" -> tweetID))
       .one[Tweet]
     )
   }

@@ -24,9 +24,9 @@ abstract class AnalysisResultsModel extends Table[AnalysisResultsModel, Analysis
   }
 
 
-  def getById(id: String): Future[List[AnalysisResults]] = {
+  def getById(word: String): Future[List[AnalysisResults]] = {
     select
-      .where(_.keyword eqs id)
+      .where(_.keyword eqs word)
       .consistencyLevel_=(ConsistencyLevel.ONE)
       .fetch()
   }

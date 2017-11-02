@@ -22,12 +22,12 @@ class TweetsAnalysisDB (override val connector: CassandraConnection) extends Dat
   /**
     * read an event
     *
-    * @param id
+    * @param word
     * @return
     */
-  def read(id: String): Future[List[AnalysisResults]] = {
+  def read(word: String): Future[List[AnalysisResults]] =  {
     for {
-      byAnalysis <- AnalysisResultsModel.getById(id)
+      byAnalysis <- AnalysisResultsModel.getById(word)
     } yield byAnalysis
   }
 

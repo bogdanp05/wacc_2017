@@ -8,17 +8,17 @@ import play.Logger
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import play.api.libs.json.Json
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 
 
-final class CassandraController @Inject()(implicit ec: ExecutionContext, cc: ControllerComponents) extends AbstractController(cc){
+final class CassandraController @Inject()(implicit ec: ExecutionContext, cc: ControllerComponents, mongoController: MongoDBController) extends AbstractController(cc){
 
-  def list(id: String):Action[AnyContent] = Action.async { implicit req =>
-    Logger.debug("Called reading: " + id)
+  def list(word: String):Action[AnyContent] = Action.async { implicit req =>
+    Logger.debug("Called reading: " + word)
     AnalysisDB.start()
     // read data
     for {
-      ans <- AnalysisDB.read(id)
+      ans <- AnalysisDB.read(word)
     } yield {
       Ok(Json.toJson(ans))
     }
@@ -34,33 +34,18 @@ final class CassandraController @Inject()(implicit ec: ExecutionContext, cc: Con
     }
   }
 
-
   /**** NOT URL *****/
+  def alreadyAnalyzedWord(word:String):Future[Boolean] = {
+    AnalysisDB.start()
+    for {
+      tweets <- AnalysisDB.read(word)
+    } yield !tweets.isEmpty
+  }
 
-  def saveTweetOnCassandra(word:String, tweetID:Long, analysis:Int, timestamp:Long) = Future {
+  def saveTweetCassandra(word:String, tweetID:Long, analysis:Int, timestamp:Long) = Future {
     AnalysisDB.start()
     val timeInMillis = System.currentTimeMillis()
     AnalysisDB.saveOrUpdate(new AnalysisResults(timeInMillis, word, tweetID, analysis, timestamp))
     Ok("working")
   }
-
-  def getTweetsOnCassandraByWord(word:String) = Future {
-    AnalysisDB.start()
-    val analysisResultFuture = AnalysisDB.read(word)
-
-    analysisResultFuture onSuccess {
-      case analysisResults => handleListAnalysisResults(analysisResults)
-    }
-    Ok("reading from cassandra")
-  }
-
-  def handleListAnalysisResults(analysisResults: List[AnalysisResults])= {
-    for(analysisResult <- analysisResults) {
-
-      println(analysisResult)
-    }
-  }
-
-
-
 }

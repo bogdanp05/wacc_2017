@@ -3,6 +3,11 @@ cassandra:
 	@docker volume create cassandra-vol
 	@docker run --name cassandra -p 7000:7000 -p 9042:9042 -v cassandra-vol:/cassandraDB -d cassandra:3.0
 
+#type "make mongo" in terminal to run mongoDB with docker 
+mongodb:
+	@docker volume create mongo-vol
+	@docker run --name mongo -p 27017:27017 -v mongo-vol:/mongoDB -d mongo
+
 #type "make stop" in terminal to stop the container
 stop:
 	@docker stop cassandra

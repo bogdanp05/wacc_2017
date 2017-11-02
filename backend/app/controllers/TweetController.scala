@@ -29,7 +29,7 @@ import connectors.MongoDB
 
 @Singleton
 class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: ControllerComponents, actorSystem: ActorSystem,
-                                mongoDB: MongoDB, cassandraController: CassandraController, mongoController: MongoController)
+                                mongoDB: MongoDB, cassandraController: CassandraController, mongoController: MongoDBController)
                                (implicit exec: ExecutionContext)
   extends AbstractController(cc) with ReactiveMongoComponents {
 
@@ -55,13 +55,11 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
   }
 
   def bogdan = Action.async {
-    cassandraController.saveTweetOnCassandra("alex",1234,1,123456789)
-    getFutureBogdan(2.second).map { msg => Ok(Json.obj("hey"->msg)).enableCors }
+    getFutureBogdan(2.second).map { msg => Ok(Json.obj("hey" -> msg)).enableCors }
   }
 
   def bogdan2 = Action.async {
-    cassandraController.getTweetsOnCassandraByWord("dog")
-    getFutureBogdan(1.second).map { msg => Ok(Json.obj("hey"->msg)).enableCors }
+    getFutureBogdan(1.second).map { msg => Ok(Json.obj("hey" -> msg)).enableCors }
   }
 
   private def getFutureBogdan(delayTime: FiniteDuration): Future[String] = {
@@ -74,8 +72,8 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
 
   private def getSentimentAnalysis(tweet: String): Int = {
     val words = tweet.split("\\s+")
-    var sentimentAnalysisResult:Double = 0
-    for(word <- words){
+    var sentimentAnalysisResult: Double = 0
+    for (word <- words) {
       if (this.positiveArrayAdjectives.contains(word)) {
         sentimentAnalysisResult += 1
       }
@@ -98,14 +96,31 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
   }
 
 
-  def getTweets(word: String) = Action {
-    val currentDirectory = new java.io.File(".").getCanonicalPath
-    //Use Logger instead of println
-    Logger.info("--------" + currentDirectory)
+  def getTweets(word: String): Action[AnyContent] = Action.async {
+    val analyzedFuture = this.cassandraController.alreadyAnalyzedWord(word)
+    analyzedFuture.map { analyzed =>
+      if (analyzed) {
+        Ok("ANALYZED").enableCors
+      }
+      else {
 
-    //val filename = "../tweetsdb.csv"
-    // This is the path in the docker container. If you want to develop without docker,
-    // you can change back the path everytime, or put the file on your machine at the same path
+        val tweetsList = this.getTweetsFromCSV(word)
+        for (tweet <- tweetsList) {
+          //ADD CASSANDRA
+          this.cassandraController.saveTweetCassandra(word,tweet.id,tweet.analysis,tweet.timestamp)
+          //ADD MONGO
+          this.mongoController.saveTweetMongo(tweet.id,tweet.timestamp,tweet.nickname,tweet.content,tweet.url,tweet.analysis)
+        }
+        Ok(Json.toJson(tweetsList)).enableCors
+      }
+    }.recover {
+      case e =>
+        e.printStackTrace()
+        BadRequest(e.getMessage())
+    }
+  }
+
+  def getTweetsFromCSV(word: String):List[Tweet] =  {
     val filename = "/var/lib/dataset/tweetsdb.csv"
     val tweets = ListBuffer[Tweet]()
     for (line <- Source.fromFile(filename, "ISO-8859-1").getLines) {
@@ -113,19 +128,14 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
       /* 0:ID    1:DATE     2:HOUR     3:NICKNAME     4:CONTENT    5:URL */
       if (cols.length.equals(6)) {
         if (this.tweetContainsWord(cols(4), word)) {
-          val dt = DateTime.parse(cols(1)+" "+cols(2), DateTimeFormat.forPattern("yyyy-MM-dd HH:mm"))
+          val dt = DateTime.parse(cols(1) + " " + cols(2), DateTimeFormat.forPattern("yyyy-MM-dd HH:mm"))
           val analysis = this.getSentimentAnalysis(cols(4))
-          val tweet = Tweet(cols(0).toLong, dt.getMillis(),cols(3),cols(4),cols(5),analysis)
-          //save tweets to cassandra
-          cassandraController.saveTweetOnCassandra(word,tweet.id,tweet.analysis,tweet.timestamp)
-          //save tweets on mongoDB
-
-          val tweetJSON = Json.toJson(tweet)
+          val tweet = Tweet(cols(0).toLong, dt.getMillis(), cols(3), cols(4), cols(5), analysis)
           tweets += tweet
         }
       }
     }
-    Ok(Json.toJson(tweets)).enableCors
+    return tweets.toList
   }
 
   def tweetContainsWord(tweet: String, wordToSearch: String): Boolean = {
@@ -144,7 +154,7 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
   def mongoGetTweets() = {
     val found = collection.map(_.find(Json.obj()).cursor[Tweet]())
     found.flatMap(_.collect[List]())
-}
+  }
 
   def getTweetsFromMongoDB(word: String): Action[AnyContent] = Action.async { implicit request =>
     val found = mongoGetTweets()
