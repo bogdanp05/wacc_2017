@@ -50,7 +50,7 @@ class TweetsAnalysisDB (override val connector: CassandraConnection) extends Dat
     */
 
   def start()={
-    Logger.debug("Create table if not exist")
+    Logger.info("Create table if not exist")
     Await.ready(AnalysisResultsModel.create.ifNotExists().future(), Duration.Inf)
   }
 

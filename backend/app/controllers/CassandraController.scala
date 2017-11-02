@@ -7,6 +7,7 @@ import models.{AnalysisResults, Tweet}
 import play.Logger
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import play.api.libs.json.Json
+import java.util.UUID
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
@@ -42,10 +43,19 @@ final class CassandraController @Inject()(implicit ec: ExecutionContext, cc: Con
     } yield !tweets.isEmpty
   }
 
-  def saveTweetCassandra(word:String, tweetID:Long, analysis:Int, timestamp:Long) = Future {
+//  def saveTweetCassandra(word:String, tweetID:Long, analysis:Int, timestamp:Long) = Future {
+//    AnalysisDB.start()
+//    val timeInMillis = System.currentTimeMillis()
+//    AnalysisDB.saveOrUpdate(new AnalysisResults(timeInMillis, word, tweetID, analysis, timestamp))
+//    Ok("working")
+//  }
+  def saveTweetsCassandra(tweets : List[Tweet], word : String) = Future {
     AnalysisDB.start()
-    val timeInMillis = System.currentTimeMillis()
-    AnalysisDB.saveOrUpdate(new AnalysisResults(timeInMillis, word, tweetID, analysis, timestamp))
+
+    for (tweet <- tweets){
+      val timeInMillis = System.currentTimeMillis()
+      AnalysisDB.saveOrUpdate(new AnalysisResults(timeInMillis, word, tweet.id, tweet.analysis, tweet.timestamp))
+    }
     Ok("working")
   }
 }

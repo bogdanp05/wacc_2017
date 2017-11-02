@@ -1,11 +1,11 @@
-1. Test Mongo connection works (should work now)
-2. !!! Insert into Mongo
+DONE 1. Test Mongo connection works (should work now)
+DONE 2. !!! Insert into Mongo
 3. !!! Read from Mongo
-4. !!! Insert into Cassandra
+DONE 4. !!! Insert into Cassandra
 5. !!! Read from Cassandra
 6. ! Use Web Sockets. Must be implemented in both backend and frontend
 7. Replication / fault tolerance
-8. Grant access to GCP project (Bogdan)
+DONE 8. Grant access to GCP project (Bogdan)
 9. Frontend: make graph work
 DONE 10. Fe: Search word at enter
 DONE 11. Fe: Display list of words at search   

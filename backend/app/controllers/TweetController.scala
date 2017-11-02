@@ -26,6 +26,7 @@ import scala.collection.mutable.ListBuffer
 import scala.io.Source
 import connectors.AnalysisDB
 import connectors.MongoDB
+import scala.util.{Success, Failure}
 
 @Singleton
 class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: ControllerComponents, actorSystem: ActorSystem,
@@ -96,31 +97,58 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
   }
 
 
-  def getTweets(word: String): Action[AnyContent] = Action.async {
-    val analyzedFuture = this.cassandraController.alreadyAnalyzedWord(word)
-    analyzedFuture.map { analyzed =>
-      if (analyzed) {
-        Ok("ANALYZED").enableCors
-      }
-      else {
+//  def getTweets(word: String): Action[AnyContent] = Action.async {
+//    val analyzedFuture = this.cassandraController.alreadyAnalyzedWord(word)
+//    analyzedFuture.map { analyzed =>
+//      if (analyzed) {
+//        Ok("ANALYZED").enableCors
+//      }
+//      else {
+//
+//        //val tweetsList = this.getTweetsFromCSV(word)
+////        val f: Future[List[Tweet]] = this.getTweetsFromCSV(word)
+////        f onComplete  {
+////          case Success(tweets) => {
+////            this.cassandraController.saveTweetsCassandra(tweets, word)
+////            this.mongoController.saveTweetsMongo(tweets)
+////            Ok(Json.toJson(tweets)).enableCors
+////          }
+////          case Failure(t) => {
+////            Ok(t.toString).enableCors
+////          }
+////
+//////          this.cassandraController.saveTweetsCassandra(tweetsList, word)
+//////          this.mongoController.saveTweetsMongo(tweetsList)
+////        }
+//        getTweetsFromCSV(word) map{ tweets =>
+//          cassandraController.saveTweetsCassandra(tweets, word)
+//          mongoController.saveTweetsMongo(tweets)
+//          Ok(Json.toJson(tweets)).enableCors
+//        }
+//
+//        Ok(Json.toJson(tweetsList)).enableCors
+//      }
+//    }.recover {
+//      case e =>
+//        e.printStackTrace()
+//        BadRequest(e.getMessage())
+//    }
+//  }
 
-        val tweetsList = this.getTweetsFromCSV(word)
-        for (tweet <- tweetsList) {
-          //ADD CASSANDRA
-          this.cassandraController.saveTweetCassandra(word,tweet.id,tweet.analysis,tweet.timestamp)
-          //ADD MONGO
-          this.mongoController.saveTweetMongo(tweet.id,tweet.timestamp,tweet.nickname,tweet.content,tweet.url,tweet.analysis)
-        }
-        Ok(Json.toJson(tweetsList)).enableCors
-      }
-    }.recover {
-      case e =>
-        e.printStackTrace()
-        BadRequest(e.getMessage())
+  def getTweets(word: String): Action[AnyContent] = Action.async {
+//    cassandraController.alreadyAnalyzedWord(word) map{ response : Boolean =>
+//      if (response) Fut
+//    }.map{
+//
+//    }
+    getTweetsFromCSV(word) map{ tweets : List[Tweet] =>
+      cassandraController.saveTweetsCassandra(tweets, word)
+      mongoController.saveTweetsMongo(tweets)
+      Ok(Json.toJson(tweets)).enableCors
     }
   }
 
-  def getTweetsFromCSV(word: String):List[Tweet] =  {
+  def getTweetsFromCSV(word: String):Future[List[Tweet]] =  Future {
     val filename = "/var/lib/dataset/tweetsdb.csv"
     val tweets = ListBuffer[Tweet]()
     for (line <- Source.fromFile(filename, "ISO-8859-1").getLines) {
@@ -135,7 +163,8 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
         }
       }
     }
-    return tweets.toList
+    tweets.toList
+    //return tweets.toList
   }
 
   def tweetContainsWord(tweet: String, wordToSearch: String): Boolean = {

@@ -47,8 +47,15 @@ final class MongoDBController @Inject()(implicit ec: ExecutionContext, cc: Contr
     Ok("getting tweets from mongoDB")
   }*/
 
-  def saveTweetMongo(tweetID: Long, timestamp: Long, nickname: String, content: String, url: String, analysis: Int) = Future {
-    mongoDB.insert(new Tweet(tweetID, timestamp, nickname, content, url, analysis))
+//  def saveTweetMongo(tweetID: Long, timestamp: Long, nickname: String, content: String, url: String, analysis: Int) = Future {
+//    mongoDB.insert(new Tweet(tweetID, timestamp, nickname, content, url, analysis))
+//    Ok("Saving on MongoDB")
+//  }
+  def saveTweetsMongo(tweets : List[Tweet]) = Future {
+    for (tweet <- tweets){
+      mongoDB.insert(tweet)
+    }
+    //mongoDB.insert(new Tweet(tweetID, timestamp, nickname, content, url, analysis))
     Ok("Saving on MongoDB")
   }
 
