@@ -28,8 +28,10 @@ import connectors.AnalysisDB
 import connectors.MongoDB
 
 @Singleton
-class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: ControllerComponents, actorSystem: ActorSystem, mongoDB: MongoDB)(implicit exec: ExecutionContext)
-  extends AbstractController(cc) with MongoController with ReactiveMongoComponents {
+class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: ControllerComponents, actorSystem: ActorSystem,
+                                mongoDB: MongoDB, cassandraController: CassandraController, mongoController: MongoController)
+                               (implicit exec: ExecutionContext)
+  extends AbstractController(cc) with ReactiveMongoComponents {
 
   type JSONReadFile = ReadFile[JSONSerializationPack.type, JsString]
 
@@ -53,13 +55,23 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
   }
 
   def bogdan = Action.async {
-    this.write2("alex")
+    cassandraController.saveTweetOnCassandra("alex",1234,1,123456789)
     getFutureBogdan(2.second).map { msg => Ok(Json.obj("hey"->msg)).enableCors }
   }
 
   def bogdan2 = Action.async {
+    cassandraController.getTweetsOnCassandraByWord("dog")
     getFutureBogdan(1.second).map { msg => Ok(Json.obj("hey"->msg)).enableCors }
   }
+
+  private def getFutureBogdan(delayTime: FiniteDuration): Future[String] = {
+    val promise: Promise[String] = Promise[String]()
+    actorSystem.scheduler.scheduleOnce(delayTime) {
+      promise.success("Bogdan async2")
+    }(actorSystem.dispatcher) // run scheduled tasks using the actor system's dispatcher
+    promise.future
+  }
+
   private def getSentimentAnalysis(tweet: String): Int = {
     val words = tweet.split("\\s+")
     var sentimentAnalysisResult:Double = 0
@@ -100,22 +112,23 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
       val cols = line.split(";").map(_.trim)
       /* 0:ID    1:DATE     2:HOUR     3:NICKNAME     4:CONTENT    5:URL */
       if (cols.length.equals(6)) {
-        if (this.needTweet(cols(4),word)) {
+        if (this.tweetContainsWord(cols(4), word)) {
           val dt = DateTime.parse(cols(1)+" "+cols(2), DateTimeFormat.forPattern("yyyy-MM-dd HH:mm"))
           val analysis = this.getSentimentAnalysis(cols(4))
           val tweet = Tweet(cols(0).toLong, dt.getMillis(),cols(3),cols(4),cols(5),analysis)
           //save tweets to cassandra
+          cassandraController.saveTweetOnCassandra(word,tweet.id,tweet.analysis,tweet.timestamp)
+          //save tweets on mongoDB
+
           val tweetJSON = Json.toJson(tweet)
           tweets += tweet
         }
       }
     }
-
-    //save tweets to mongoDB
     Ok(Json.toJson(tweets)).enableCors
   }
 
-  def needTweet(tweet: String, wordToSearch: String): Boolean = {
+  def tweetContainsWord(tweet: String, wordToSearch: String): Boolean = {
     val words = tweet.split("\\s+")
     for(word <- words){
       if (word.toLowerCase.equals(wordToSearch.toLowerCase)
@@ -146,65 +159,8 @@ class TweetController @Inject()(val reactiveMongoApi: ReactiveMongoApi ,cc: Cont
             }
   }
 
-  // CASSANDRA FUNCTIONS
-
-  def list(id: String): Action[AnyContent] = Action.async { implicit req =>
-    Logger.debug("Called reading: " + id)
-    AnalysisDB.start()
-    // read data
-    for {
-      ans <- AnalysisDB.read(id)
-    } yield {
-      Ok(Json.toJson(ans))
-    }
-  }
-
-  private def getFutureBogdan(delayTime: FiniteDuration): Future[String] = {
-    val promise: Promise[String] = Promise[String]()
-    actorSystem.scheduler.scheduleOnce(delayTime) {
-      promise.success("Bogdan async2")
-    }(actorSystem.dispatcher) // run scheduled tasks using the actor system's dispatcher
-    promise.future
-  }
-
-  def write(id:String) = Action {
-    AnalysisDB.start()
-    val timeInMillis = System.currentTimeMillis()
-    AnalysisDB.saveOrUpdate(new AnalysisResults(timeInMillis, id, 123, 1, 123456789))
-    Ok("working")
-  }
-
-  def write2(id:String) = Future {
-    AnalysisDB.start()
-    val timeInMillis = System.currentTimeMillis()
-    AnalysisDB.saveOrUpdate(new AnalysisResults(timeInMillis, id, 123, 1, 123456789))
-    Ok("working")
-  }
-
-  // MONGO DB FUNCTIONS
-
-  def list_mongo(word: String):Action[AnyContent] = Action.async { implicit req =>
-    Logger.debug("Called reading: " + word)
-
-    // read data
-    for {
-      ans <- mongoDB.read(word)
-    } yield {
-      Ok(Json.toJson(ans))
-    }
-  }
 
 
-  def insert_mongo(word: String):Action[AnyContent] = Action.async { implicit req =>
-    Logger.debug("Called reading: " + word)
-
-    // read data for test
-    for {
-      ans <- mongoDB.insert(new Tweet(10L, 32L, "AAA", word, "", 1))
-    } yield {
-      Ok(ans.toString())
-    }
-  }
 
   implicit class RichResult (result: Result) {
     def enableCors =  result.withHeaders(
