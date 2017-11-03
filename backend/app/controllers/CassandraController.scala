@@ -2,15 +2,16 @@ package controllers
 
 import javax.inject.Inject
 
-import connectors.{AnalysisDB, MongoDB}
+import connectors.AnalysisDB
 import models.{AnalysisResults, Tweet}
-import play.Logger
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import play.api.libs.json.Json
-import java.util.UUID
 
+import play.api.Logger
+
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future, Promise}
-
+import java.util.UUID
 
 final class CassandraController @Inject()(implicit ec: ExecutionContext, cc: ControllerComponents, mongoController: MongoDBController) extends AbstractController(cc){
 
@@ -27,9 +28,9 @@ final class CassandraController @Inject()(implicit ec: ExecutionContext, cc: Con
 
   def write(id:String):Action[AnyContent] = Action.async {  implicit req =>
     AnalysisDB.start()
-    val timeInMillis = System.currentTimeMillis()
+    val uuid = UUID.randomUUID().toString
     for {
-      ans <- AnalysisDB.saveOrUpdate(new AnalysisResults(timeInMillis, id, 123, 1, 123456789))
+      ans <- AnalysisDB.saveOrUpdate(new AnalysisResults(uuid, id, "sdfvsef", 1, 123456789))
     } yield {
       Ok(ans.toString)
     }
@@ -37,6 +38,7 @@ final class CassandraController @Inject()(implicit ec: ExecutionContext, cc: Con
 
   /**** NOT URL *****/
   def alreadyAnalyzedWord(word:String):Future[Boolean] = {
+    Logger.info("----------here1.1")
     AnalysisDB.start()
     for {
       tweets <- AnalysisDB.read(word)
@@ -51,11 +53,29 @@ final class CassandraController @Inject()(implicit ec: ExecutionContext, cc: Con
 //  }
   def saveTweetsCassandra(tweets : List[Tweet], word : String) = Future {
     AnalysisDB.start()
-
+    var i = 0
     for (tweet <- tweets){
-      val timeInMillis = System.currentTimeMillis()
-      AnalysisDB.saveOrUpdate(new AnalysisResults(timeInMillis, word, tweet.id, tweet.analysis, tweet.timestamp))
+      val uuid = UUID.randomUUID().toString
+      AnalysisDB.saveOrUpdate(new AnalysisResults(uuid, word, tweet.id, tweet.analysis, tweet.timestamp))
+      i = i + 1
     }
-    Ok("working")
+    Logger.info("------inserted in Cass: " + i)
+    //Ok("working")
   }
+
+  def getIdsCassandra(word: String): Future[List[String]] = {
+    AnalysisDB.start()
+    val tweets = ListBuffer[String]()
+    AnalysisDB.read(word).map { analysis =>
+      for (a <- analysis){
+        //Logger.info(a.tweetID.toString)
+        tweets += a.tweetID
+      }
+      Logger.info("----------ids from cassandra" + tweets.length)
+      tweets.toList
+    }
+
+  }
+
+
 }

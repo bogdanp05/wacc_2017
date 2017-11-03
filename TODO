@@ -1,8 +1,8 @@
 DONE 1. Test Mongo connection works (should work now)
 DONE 2. !!! Insert into Mongo
-3. !!! Read from Mongo
+DONE 3. !!! Read from Mongo
 DONE 4. !!! Insert into Cassandra
-5. !!! Read from Cassandra
+DONE 5. !!! Read from Cassandra
 6. ! Use Web Sockets. Must be implemented in both backend and frontend
 7. Replication / fault tolerance
 DONE 8. Grant access to GCP project (Bogdan)

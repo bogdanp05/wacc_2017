@@ -1,7 +1,5 @@
 package models
 
-import java.util.Dictionary
-
 import play.api.libs.json.Json
 
 /**
@@ -10,9 +8,9 @@ import play.api.libs.json.Json
   */
 
 case class AnalysisResults(
-                          id: Long,
+                          id: String,
                           keyword: String,
-                          tweetID: Long,
+                          tweetID: String,
                           analysis: Int,
                           timestamp: Long
                           )

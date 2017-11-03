@@ -35,5 +35,15 @@ class MongoDB @Inject()(implicit ec: ExecutionContext, val reactiveMongoApi: Rea
     )
   }
 
+  def readList(ids: List[String]): Future[List[Tweet]] = {
+    val query = BSONDocument("id" -> BSONDocument("$in" -> ids))
+    Collection.flatMap(_
+      .find(query)
+      .cursor[Tweet]()
+      .collect[List]()
+    )
+  }
+
+
 
 }

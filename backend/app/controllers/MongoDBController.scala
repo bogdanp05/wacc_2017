@@ -4,10 +4,11 @@ import javax.inject.Inject
 
 import connectors.MongoDB
 import models.Tweet
-import play.Logger
+import play.api.Logger
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import play.api.libs.json.Json
 
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -30,7 +31,7 @@ final class MongoDBController @Inject()(implicit ec: ExecutionContext, cc: Contr
 
     // read data for test
     for {
-      ans <- mongoDB.insert(new Tweet(10L, 32L, "AAA", word, "", 1))
+      ans <- mongoDB.insert(new Tweet("sdvsvgsvg", 32L, "AAA", word, "", 1))
     } yield {
       Ok(ans.toString())
     }
@@ -52,11 +53,27 @@ final class MongoDBController @Inject()(implicit ec: ExecutionContext, cc: Contr
 //    Ok("Saving on MongoDB")
 //  }
   def saveTweetsMongo(tweets : List[Tweet]) = Future {
+    var i = 0
     for (tweet <- tweets){
       mongoDB.insert(tweet)
+      i = i + 1
     }
+    Logger.info("------inserted in Mongo: " + i)
     //mongoDB.insert(new Tweet(tweetID, timestamp, nickname, content, url, analysis))
-    Ok("Saving on MongoDB")
+    //Ok("Saving on MongoDB")
+  }
+
+  def getTweetsFromMongo(ids: List[String]): Future[List[Tweet]] =  {
+    val retTweets = ListBuffer[Tweet]()
+    mongoDB.readList(ids).map {tweets =>
+      for (tweet <- tweets){
+        //Logger.info(tweet.content)
+        retTweets += tweet
+      }
+      Logger.info("----------tweets from mongo" + retTweets.length)
+      retTweets.toList
+    }
+
   }
 
 }

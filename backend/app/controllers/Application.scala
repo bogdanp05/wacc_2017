@@ -10,8 +10,6 @@ import reactivemongo.api.gridfs.{GridFS, ReadFile}
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
 import reactivemongo.play.json._
 import reactivemongo.play.json.collection._
-import models.Tweet
-import reactivemongo.api.Cursor
 
 /*
  * Example using ReactiveMongo + Play JSON library.

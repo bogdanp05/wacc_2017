@@ -26,6 +26,7 @@ class TweetsAnalysisDB (override val connector: CassandraConnection) extends Dat
     * @return
     */
   def read(word: String): Future[List[AnalysisResults]] =  {
+    Logger.info("I am here")
     for {
       byAnalysis <- AnalysisResultsModel.getById(word)
     } yield byAnalysis

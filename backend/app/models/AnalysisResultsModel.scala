@@ -7,9 +7,9 @@ abstract class AnalysisResultsModel extends Table[AnalysisResultsModel, Analysis
 
   override def tableName: String = "Analysis"
 
-  object id extends LongColumn with PrimaryKey
+  object id extends StringColumn with PrimaryKey
   object keyword extends StringColumn with PartitionKey
-  object tweetID extends LongColumn
+  object tweetID extends StringColumn
   object analysis extends IntColumn
   object timestamp extends LongColumn
 
