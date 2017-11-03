@@ -40,7 +40,8 @@ class MongoDB @Inject()(implicit ec: ExecutionContext, val reactiveMongoApi: Rea
     Collection.flatMap(_
       .find(query)
       .cursor[Tweet]()
-      .collect[List]()
+        .collect[List]()
+      //.collect[List]()
     )
   }
 

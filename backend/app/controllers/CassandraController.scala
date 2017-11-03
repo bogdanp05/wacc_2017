@@ -65,14 +65,14 @@ final class CassandraController @Inject()(implicit ec: ExecutionContext, cc: Con
 
   def getIdsCassandra(word: String): Future[List[String]] = {
     AnalysisDB.start()
-    val tweets = ListBuffer[String]()
+    val ids = ListBuffer[String]()
     AnalysisDB.read(word).map { analysis =>
       for (a <- analysis){
         //Logger.info(a.tweetID.toString)
-        tweets += a.tweetID
+        ids += a.tweetID
       }
-      Logger.info("----------ids from cassandra" + tweets.length)
-      tweets.toList
+      Logger.info("----------ids from cassandra" + ids.length)
+      ids.toList
     }
 
   }
