@@ -28,3 +28,4 @@ sort
 
 - kubectl logs backend-3573919465-b9t1
 - kubectl exec -t -i backend-3573919465-b9t19 /bin/bash
+- 
