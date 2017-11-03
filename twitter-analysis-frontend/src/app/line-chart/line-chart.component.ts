@@ -12,9 +12,9 @@ export class LineChartComponent implements OnInit  {
   constructor(private tweetService:  TweetService) { }
 // lineChart
   public lineChartData: Array<any> = [
-    {data: [0, 0, 0, 0, 0, 0, 0], label: 'Positives'},
-    {data: [0, 0, 0, 0, 0, 0, 0], label: 'Neutral'},
-    {data: [0, 0, 0, 0, 0, 0, 0], label: 'Negatives'}
+    {data: this.getAmountOfTweetsByTime(1), label: 'Positives'},
+    {data: this.getAmountOfTweetsByTime(0), label: 'Neutral'},
+    {data: this.getAmountOfTweetsByTime(-1), label: 'Negatives'}
   ];
   public lineChartLabels: Array <any> = ['04/03/2016', '6h', '12h', '18h', '05/03/2016', '6h', '12h', '18h',
     '06/03/2016', '6h', '12h', '18h'];
@@ -62,16 +62,7 @@ export class LineChartComponent implements OnInit  {
 
 
   ngOnInit() {
-    const amountOfTweetsByTimePositives = this.getAmountOfTweetsByTime(1)
-    const amountOfTweetsByTimeNetural = this.getAmountOfTweetsByTime(0)
-    const amountOfTweetsByTimeNegatives = this.getAmountOfTweetsByTime(-1)
 
-
-    this.lineChartData = [
-      {data: amountOfTweetsByTimePositives, label: 'Positives'},
-      {data: amountOfTweetsByTimeNetural, label: 'Neutral'},
-      {data: amountOfTweetsByTimeNegatives, label: 'Negatives'}
-    ];
   }
 
   getAmountOfTweetsByTime(quality: number): Array<number> {
