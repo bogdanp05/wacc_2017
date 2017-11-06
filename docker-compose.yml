@@ -1,34 +1,110 @@
 version: '2'
 
-networks:
-  isolation-network:
-    driver: bridge
+volumes:
+  mongo-vol: {}
+  cassandra-vol: {}
+  # mongo-vol2: {}
+  # cassandra-vol2: {}
+  # mongo-vol3: {}
+  # cassandra-vol3: {}
+
  
 services:
+
+  mongo:
+    image: mongo:3.4
+    # networks:
+    #   - internal-net
+    ports:
+       - "27017:27017"
+    volumes:
+      - mongo-vol:/data/db
+    environment:
+      - MONGODB_REPLICA_SET_MODE=primary
+
+  # mongodb-2:
+  #   image: mongo:3.4
+  #   # networks:
+  #   #   - internal-net
+  #   volumes:
+  #     - mongo-vol2:/data/db
+  #   depends_on:
+  #     - mongo
+  #   environment:
+  #     - MONGODB_REPLICA_SET_MODE=secondary
+  #     - MONGODB_PRIMARY_HOST=mongo
+
+  # mongodb-3:
+  #   image: mongo:3.4
+  #   # networks:
+  #   #   - internal-net
+  #   volumes:
+  #     - mongo-vol3:/data/db
+  #   depends_on:
+  #     - mongo
+  #   environment:
+  #     - MONGODB_REPLICA_SET_MODE=arbiter
+  #     - MONGODB_PRIMARY_HOST=mongo
+
+
+  cassandra:
+    image: cassandra:3.0
+    # networks:
+    #   - internal-net
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra-vol:/cassandraDB/data/db
+
+  # cassandra2:
+  #   image: cassandra:3.0
+  #   container_name: cassandra2
+  #   # networks:
+  #   #   - internal-net
+  #   volumes:
+  #     - cassandra-vol2:/cassandraDB/data/db
+  #   links:
+  #    - cassandra:seed
+  #   environment:
+  #    - CASSANDRA_SEEDS=seed
+
+  # cassandra3:
+  #   image: cassandra:3.0
+  #   container_name: cassandra3
+  #   # networks:
+  #   #   - internal-net
+  #   volumes:
+  #     - cassandra-vol3:/cassandraDB/data/db
+  #   links:
+  #    - cassandra:seed
+  #   environment:
+  #    - CASSANDRA_SEEDS=seed
+
+
   # Build the container using the Dockerfile provided by Play Framework
   backend:
-      build: ./backend/target/docker/stage
+      image: bogdanp05/backend:latest
       ports:
-            - "9000:9000"
-      networks:
-            - isolation-network
+           - "9000:9000"
+      links:
+            - mongo
+            - cassandra
 
   # Build the container using the client Dockerfile
-  client:
-      build: ./twitter-analysis-frontend
-      # ports:
-      #      - "4200:4200"
-      # networks:
-      #      - isolation-network
+  frontend:
+       image: bogdanp05/frontend:latest
+       ports:
+             - "4200:4200"
+       links:
+             - backend 
 
   # Build the container using the nginx Dockerfile
   nginx:
-    build: ./nginx
+    image: bogdanp05/nginx:latest
     # Map Nginx port 80 to the local machine's port 4200
     ports:
-      - "4200:80"
-      # - "9000:9000"  
+      - "80:80"  
     # Link the client container so that Nginx will have access to it
     links:
+      - frontend
       - backend
-      - client

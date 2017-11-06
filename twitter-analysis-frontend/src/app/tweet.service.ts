@@ -25,13 +25,8 @@ export class TweetService {
     this.messageSource.next(message);
   }
 
-  getTweets(): Promise<Tweet[]> {
-    const tweetsJSON = this.http.get('http://' + window.location.hostname + ':9000/getAllTweets')
-      .toPromise()
-      .then(response => response.json() as Tweet[])
-      .catch(this.handleError);
-    tweetsJSON.then(tweets => this.tweets = tweets);
-    return tweetsJSON;
+  getTweets()  {
+    return this.tweets;
   }
 
   filterAllTweets() {
@@ -43,9 +38,15 @@ export class TweetService {
     this.subject.next(this.tweetsResult);
   }
 
-  filterTweetsWithText(text: string) {
-    this.tweetsResult = this.tweets.filter(tweet => tweet.content.includes(text));
-    this.subject.next(this.tweetsResult);
+  getTweetsWithWord(word: string): Promise<Tweet[]> {
+    console.log('http://' + window.location.hostname + '/api/getTweets/' + word);
+    const tweetsJSON = this.http.get('http://' + window.location.hostname + '/api/getTweets/' + word)
+      .toPromise()
+      .then(response => response.json() as Tweet[])
+      .catch(this.handleError);
+    tweetsJSON.then(tweets => this.tweets = tweets)
+              .then(() => this.filterAllTweets());
+    return tweetsJSON;
   }
 
   getNumberOfTweets(quality: number) {
@@ -53,7 +54,46 @@ export class TweetService {
   }
 
   getNumberOfAllTweets() {
-      return this.tweets.length
+      return this.tweets.length;
+  }
+
+  getAmountOfTweetsByTime(quality: number): Array<number> {
+
+    const analysisArray = [0, 0, 0, 0, 0, 0, 0, 0];
+    for (const tweet of this.tweets) { //Solved that
+      const date = new Date(tweet.timestamp);
+      const day = date.getDay();
+      const hour = date.getHours();
+
+      const firstArrayPosition = (day - 5) * 4;
+      if (hour >= 0 && hour <= 6) {
+        if (tweet.analysis === quality) {
+          analysisArray[firstArrayPosition] += 1;
+        }
+      }
+      else if (hour > 6 && hour <= 12) {
+        if (tweet.analysis === quality) {
+          analysisArray[firstArrayPosition + 1] += 1;
+        }
+      }
+      else if (hour > 12 && hour <= 18) {
+        if (tweet.analysis === quality) {
+          analysisArray[firstArrayPosition + 2] += 1;
+        }
+      }
+      else if (hour > 18 && hour <= 23) {
+        if (tweet.analysis === quality) {
+          analysisArray[firstArrayPosition + 3] += 1;
+        }
+      }
+    }
+    /*
+    * Diagram
+    * 0: 04/../....   1: 6h    2: 12h     3: 18h
+    * 4: 05/../....   5: 6h    6: 12h     7: 18h
+    * 8: 06/../....   9: 6h    10: 12h   11: 18h
+    * */
+    return analysisArray;
   }
 
   private handleError(error: any): Promise<any> {

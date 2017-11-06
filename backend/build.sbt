@@ -1,3 +1,4 @@
+import com.typesafe.sbt.packager.docker.{Cmd, ExecCmd}
 
 name := "backend"
  
@@ -21,9 +22,9 @@ libraryDependencies ++= Seq(
   jdbc ,
   ehcache ,
   ws ,
-  specs2 % Test ,
   guice,
   "org.reactivemongo" %% "play2-reactivemongo" % "0.12.6-play26",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "test",
 
   // connector of cassandra
   "com.datastax.cassandra" % "cassandra-driver-core" % "3.3.0",
@@ -40,6 +41,16 @@ libraryDependencies ++= Seq(
 
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )
 
+dockerCommands := Seq(
+  Cmd("FROM", "openjdk:latest"),
+  Cmd("WORKDIR", "/opt/docker"),
+  Cmd("ADD", "opt", "/opt"),
+  Cmd("COPY", "dataset", "/var/lib/dataset"),
+  Cmd("RUN", "[\"chown\", \"-R\", \"daemon:daemon\", \".\"]"),
+  Cmd("USER", "daemon"),
+  Cmd("ENTRYPOINT", "[\"bin/backend\"]"),
+  ExecCmd("CMD")
+)
 
 
-      
+

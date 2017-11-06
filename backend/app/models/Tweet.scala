@@ -1,25 +1,26 @@
 package models
 
-import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
-import play.api.data.validation.Constraints.pattern
+import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
 
 case class Tweet(
-                  id: Option[Long],
-                  timestamp: Option[Long],
+                  id: String,
+                  timestamp: Long,
                   nickname: String,
                   content: String,
                   url: String,
                   analysis: Int)
 
 
-// Turn off your mind, relax, and float downstream
-// It is not dying...
+
 object Tweet {
   import play.api.libs.json._
 
-  implicit object ArticleWrites extends OWrites[Tweet] {
+  implicit val bsonRead: BSONDocumentReader[Tweet] = Macros.reader[Tweet]
+  implicit val bsonWrite: BSONDocumentWriter[Tweet] = Macros.writer[Tweet]
+
+  implicit object TweetWrites extends OWrites[Tweet] {
     def writes(tweet: Tweet): JsObject = Json.obj(
       "id" -> tweet.id,
       "timestamp" -> tweet.timestamp,
@@ -30,11 +31,11 @@ object Tweet {
     )
   }
 
-  implicit object ArticleReads extends Reads[Tweet] {
+  implicit object TweetReads extends Reads[Tweet] {
     def reads(json: JsValue): JsResult[Tweet] = json match {
       case obj: JsObject => try {
-        val id = (obj \ "id").asOpt[Long]
-        val timestamp = (obj \ "timestamp").asOpt[Long]
+        val id = (obj \ "id").as[String]
+        val timestamp = (obj \ "timestamp").as[Long]
         val nickname = (obj \ "nickname").as[String]
         val content = (obj \ "content").as[String]
         val url = (obj \ "url").as[String]
@@ -52,8 +53,8 @@ object Tweet {
 
   val form = Form(
     mapping(
-      "id" -> optional(longNumber),
-      "timestamp" -> optional(longNumber),
+      "id" -> nonEmptyText,
+      "timestamp" -> longNumber,
       "nickname" -> nonEmptyText,
       "content" -> text,
       "url" -> nonEmptyText,
